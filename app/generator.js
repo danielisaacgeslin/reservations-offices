@@ -11,6 +11,8 @@ require('./filters/time.filter');
 require('./filters/department.filter');
 require('./filters/month.filter');
 require('./filters/dateToNumber.filter');
+require('./filters/fromTime.filter');
+require('./filters/toTime.filter');
 /*directives*/
 require('./directives/toaster.directive');
 require('./directives/calendar.directive');
@@ -21,3 +23,4 @@ require('./controllers/main.controller');
 require('./controllers/confirmationModal.controller');
 require('./controllers/reservation.controller');
 require('./controllers/tags.controller');
+require('./controllers/spaces.controller');

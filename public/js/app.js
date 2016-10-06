@@ -32,6 +32,12 @@
       controller: 'tagsController',
       controllerAs: 'vm',
 			resolve: {ping: ping}
+		}).state('/spaces', {
+			url : '/spaces',
+      templateUrl : 'spaces.html',
+      controller: 'spacesController',
+      controllerAs: 'vm',
+			resolve: {ping: ping}
 		});
 	}
 
@@ -366,8 +372,8 @@
 	    vm.deleteComment = deleteComment;
 			vm.setTag = setTag;
 			vm.deleteTag = deleteTag;
-			vm.ableToCheckVailidity = false;
 
+			vm.ableToCheckVailidity = false;
 			vm.loading = false;
 
 			$scope.$watch('vm.edition.date', _checkValidity);
@@ -431,11 +437,9 @@
 				space: space
 			};
 
-			if(!vm.ableToCheckVailidity){
-				return false;
-			}
+			var valid = Boolean(!!day && !!month && !!year && !!from && !!to && !!space);
 
-			if(!day || !month || !year || !from || !to || !space || angular.equals(check, vm.lastCheck)){
+			if(!vm.ableToCheckVailidity || !valid || angular.equals(check, vm.lastCheck)){
 				vm.reservationValidity = false;
 				return false;
 			}
@@ -644,6 +648,32 @@
 },{}],7:[function(require,module,exports){
 (function(){
 	'use strict';
+	angular.module('app').controller('spacesController', spacesController);
+
+	spacesController.$inject = ['$scope', 'storeService'];
+
+	function spacesController($scope, storeService) {
+		var vm = this;
+		vm.spaces = {};
+
+		_activate();
+
+		/*private functions*/
+		function _activate(){
+			storeService.getSpaces().then(function(spaces){
+				vm.spaces = spaces;
+			});
+		}
+		/*end private functions*/
+
+		/*public functions*/
+		/*end public functions*/
+	}
+})();
+
+},{}],8:[function(require,module,exports){
+(function(){
+	'use strict';
 	angular.module('app').controller('tagsController', tagsController);
 
 	tagsController.$inject = ['$scope', 'storeService'];
@@ -667,7 +697,7 @@
 	}
 })();
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function(){
 	'use strict';
 	angular.module('app').directive('calendar', calendarDirective);
@@ -751,7 +781,7 @@
 	}
 })();
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 (function(){
 	'use strict';
 	angular.module('app').directive('toaster', toaster);
@@ -792,7 +822,7 @@
 	}
 })();
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function(){
 	'use strict';
 	angular.module('app').filter('dateToNumber', dateToNumberFilter);
@@ -806,7 +836,7 @@
 	}
 })();
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function(){
 	'use strict';
 	angular.module('app').filter('department', departmentFilter);
@@ -846,7 +876,26 @@
 	}
 })();
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
+(function(){
+	'use strict';
+	angular.module('app').filter('fromTimeFilter', fromTimeFilter);
+
+	function fromTimeFilter() {
+		return function(items,to){
+      items = [].concat(items);
+      for(var i=0; i<items.length; i++){
+        if(items[i] >= to){
+          items.splice(i, 1);
+          i--;
+        }
+      }
+      return items;
+    };
+	}
+})();
+
+},{}],14:[function(require,module,exports){
 (function(){
 	'use strict';
 	angular.module('app').filter('monthFilter', monthFilter);
@@ -864,7 +913,7 @@
 	}
 })();
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function(){
 	'use strict';
 	angular.module('app').filter('time', timeFilter);
@@ -892,7 +941,26 @@
 	}
 })();
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
+(function(){
+	'use strict';
+	angular.module('app').filter('toTimeFilter', toTimeFilter);
+
+	function toTimeFilter() {
+		return function(items,from){
+      items = [].concat(items);
+      for(var i=0; i<items.length; i++){
+        if(items[i] <= from){
+          items.splice(i, 1);
+          i--;
+        }
+      }
+      return items;
+    };
+	}
+})();
+
+},{}],17:[function(require,module,exports){
 /*modules*/
 require('./modules/app.module');
 require('./config');
@@ -906,6 +974,8 @@ require('./filters/time.filter');
 require('./filters/department.filter');
 require('./filters/month.filter');
 require('./filters/dateToNumber.filter');
+require('./filters/fromTime.filter');
+require('./filters/toTime.filter');
 /*directives*/
 require('./directives/toaster.directive');
 require('./directives/calendar.directive');
@@ -916,14 +986,15 @@ require('./controllers/main.controller');
 require('./controllers/confirmationModal.controller');
 require('./controllers/reservation.controller');
 require('./controllers/tags.controller');
+require('./controllers/spaces.controller');
 
-},{"./config":1,"./controllers/app.controller":2,"./controllers/confirmationModal.controller":3,"./controllers/login.controller":4,"./controllers/main.controller":5,"./controllers/reservation.controller":6,"./controllers/tags.controller":7,"./directives/calendar.directive":8,"./directives/toaster.directive":9,"./filters/dateToNumber.filter":10,"./filters/department.filter":11,"./filters/month.filter":12,"./filters/time.filter":13,"./modules/app.module":15,"./services/ajax.service":16,"./services/interceptor.service":17,"./services/process.service":18,"./services/store.service":19}],15:[function(require,module,exports){
+},{"./config":1,"./controllers/app.controller":2,"./controllers/confirmationModal.controller":3,"./controllers/login.controller":4,"./controllers/main.controller":5,"./controllers/reservation.controller":6,"./controllers/spaces.controller":7,"./controllers/tags.controller":8,"./directives/calendar.directive":9,"./directives/toaster.directive":10,"./filters/dateToNumber.filter":11,"./filters/department.filter":12,"./filters/fromTime.filter":13,"./filters/month.filter":14,"./filters/time.filter":15,"./filters/toTime.filter":16,"./modules/app.module":18,"./services/ajax.service":19,"./services/interceptor.service":20,"./services/process.service":21,"./services/store.service":22}],18:[function(require,module,exports){
 (function(){
   'use strict';
   angular.module('app', ['ui.router','ngAnimate', 'ui.bootstrap']);
 })();
 
-},{}],16:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function(){
 	'use strict';
 	angular.module('app').factory('ajaxService', ajaxService);
@@ -1140,7 +1211,7 @@ require('./controllers/tags.controller');
 	}
 })();
 
-},{}],17:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function(){
 	'use strict';
 	angular.module('app').factory('interceptor', interceptor);
@@ -1185,7 +1256,7 @@ require('./controllers/tags.controller');
 	}
 })();
 
-},{}],18:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function(){
 	'use strict';
 	angular.module('app').factory('processService', processService);
@@ -1230,7 +1301,7 @@ require('./controllers/tags.controller');
 	}
 })();
 
-},{}],19:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function(){
 	'use strict';
 	angular.module('app').factory('storeService', storeService);
@@ -1490,4 +1561,4 @@ require('./controllers/tags.controller');
 	}
 })();
 
-},{}]},{},[14]);
+},{}]},{},[17]);

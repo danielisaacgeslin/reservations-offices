@@ -44,8 +44,8 @@
 	    vm.deleteComment = deleteComment;
 			vm.setTag = setTag;
 			vm.deleteTag = deleteTag;
-			vm.ableToCheckVailidity = false;
 
+			vm.ableToCheckVailidity = false;
 			vm.loading = false;
 
 			$scope.$watch('vm.edition.date', _checkValidity);
@@ -109,11 +109,9 @@
 				space: space
 			};
 
-			if(!vm.ableToCheckVailidity){
-				return false;
-			}
+			var valid = Boolean(!!day && !!month && !!year && !!from && !!to && !!space);
 
-			if(!day || !month || !year || !from || !to || !space || angular.equals(check, vm.lastCheck)){
+			if(!vm.ableToCheckVailidity || !valid || angular.equals(check, vm.lastCheck)){
 				vm.reservationValidity = false;
 				return false;
 			}

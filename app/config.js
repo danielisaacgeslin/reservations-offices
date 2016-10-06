@@ -31,6 +31,12 @@
       controller: 'tagsController',
       controllerAs: 'vm',
 			resolve: {ping: ping}
+		}).state('/spaces', {
+			url : '/spaces',
+      templateUrl : 'spaces.html',
+      controller: 'spacesController',
+      controllerAs: 'vm',
+			resolve: {ping: ping}
 		});
 	}
 

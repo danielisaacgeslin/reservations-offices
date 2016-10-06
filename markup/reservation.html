@@ -51,9 +51,13 @@
         <input class="form-control" type="date" ng-model="vm.edition.date"/>
         <label>From - To</label>
         <div class="dual-selects">
-          <select class="form-control" ng-model="vm.edition.from_time" ng-options="time + ':00 hs' for time in vm.times">
+          <select class="form-control"
+            ng-model="vm.edition.from_time"
+            ng-options="time + ':00 hs' for time in vm.times | fromTimeFilter:vm.edition.to_time">
           </select>
-          <select class="form-control" ng-model="vm.edition.to_time" ng-options="time + ':00 hs' for time in vm.times">
+          <select class="form-control"
+            ng-model="vm.edition.to_time"
+            ng-options="time + ':00 hs' for time in vm.times | toTimeFilter:vm.edition.from_time">
           </select>
         </div>
         <label>Space</label>
@@ -61,12 +65,12 @@
         ng-model="vm.edition.space"
         ng-options="value.id as value.text for (key, value) in vm.spaces"></select>
       </div>
-      <small ng-show="!vm.reservationValidity" class="text-danger">This date and time are already taken</small>
       <label>Description</label>
       <textarea class="form-control" type="text" ng-model="vm.edition.description"></textarea>
       <!--
       <label>Body</label>
       <textarea class="form-control" ng-model="vm.edition.body"></textarea>-->
+      <small ng-show="!vm.reservationValidity" class="text-danger">This reservation is already taken</small>
       <button ng-disabled="vm.loading || !vm.reservationValidity" ng-click="vm.saveReservation()" ng-disabled="!vm.reservationValidity" class="btn btn-primary col-xs-12">Save</button>
     </div>
     <div>

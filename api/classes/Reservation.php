@@ -95,8 +95,10 @@ class Reservation {
     public function getReservation($id) {
         $link = Connection::connect();
 
-        $query = 'SELECT A.*, B.FLOOR, B.DEPARTMENT, B.FIRST_NAME, B.LAST_NAME FROM RESERVATIONS AS A '
-                . 'INNER JOIN USERS AS B ON A.CREATION_USER = B.ID WHERE A.ID = :id';
+        $query = 'SELECT A.*, B.FLOOR, B.DEPARTMENT, B.FIRST_NAME, B.LAST_NAME, C.TEXT AS "SPACE_TEXT" FROM RESERVATIONS AS A '
+                . 'INNER JOIN USERS AS B ON A.CREATION_USER = B.ID '
+                . 'INNER JOIN SPACES AS C ON A.SPACE = C.ID '
+                . 'WHERE A.ID = :id';
 
         $stmt = $link->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);

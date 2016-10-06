@@ -31,7 +31,7 @@
           <th></th>
           <th>ID</th>
           <th>Date</th>
-          <th>Department</th>
+          <th>Space</th>
           <th>Name</th>
           <th>Time</th>
           <th>Title</th>
@@ -44,14 +44,14 @@
           <td>{{$index + 1}}</td>
           <td>{{reservation.id}}</td>
           <td>{{reservation.date | date: 'dd/MM/y'}}</td>
-          <td>{{reservation.floor}}° {{reservation.department | department}}</td>
+          <td>{{reservation.space_text}}</td>
           <td>{{reservation.first_name}} {{reservation.last_name}}</td>
-          <td>{{reservation.time | time}}</td>
+          <td>{{reservation.from_time}}:00 hs to {{reservation.to_time}}:00 hs</td>
           <td class="title">{{reservation.title}}</td>
           <td>{{reservation.creation_timestamp | date: 'dd/MM/y HH:mm'}}</td>
           <td><a ng-disabled="vm.loading" ng-show="vm.currentUser.id === reservation.creation_user && vm.checkVaidity(reservation.date)"
                  ng-click="vm.deleteReservation(reservation.id)">delete</a></td>
-          <td><a ng-href="#/reservation/{{reservation.id}}">details</a></td>
+          <td><a ng-href="#/reservation/{{reservation.id}}/{{reservation.date | dateToNumber}}">details</a></td>
         </tr>
       </tbody>
     </table>
