@@ -44,8 +44,7 @@ switch ($route) {
         break;
     case 'reservationValidity':
         $reservation = new Reservation();
-        $result = $reservation->reservationValidity($_GET['day'], $_GET['month'], $_GET['year'], $_GET['time']);
-        
+        $result = $reservation->reservationValidity($_GET['day'], $_GET['month'], $_GET['year'], $_GET['from'], $_GET['to']);
         response(OK, $result);
         break;
     case 'getReservation':
@@ -54,12 +53,12 @@ switch ($route) {
         break;
     case 'saveReservation':
         $reservation = new Reservation();
-        $result = $reservation->setReservation($_POST['title'], $_POST['date'], $_POST['time']);
+        $result = $reservation->setReservation($_POST['title'], $_POST['date'], $_POST['from'], $_POST['to']);
         ($result ? response(OK, $result) : response(ERROR, ""));
         break;
     case 'updateReservation':
         $reservation = new Reservation();
-        $result = $reservation->updateReservation($_POST['reservation_id'], $_POST['title'], $_POST['date'], $_POST['time']);
+        $result = $reservation->updateReservation($_POST['reservation_id'], $_POST['title'], $_POST['date'], $_POST['from'], $_POST['to']);
         ($result ? response(OK, $result) : response(ERROR, ""));
         break;
     case 'deleteReservation':

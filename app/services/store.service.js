@@ -135,18 +135,18 @@
       return defer.promise;
     }
 
-    function setReservation(title, description, body, date, time, reservationId){
+    function setReservation(obj){
       var defer = $q.defer();
       /*save*/
-      if(!reservationId){
-        ajaxService.saveReservation(title, description, body, date, time).then(function(response){
+      if(!obj.reservation_id){
+        ajaxService.saveReservation(obj).then(function(response){
           defer.resolve(response.data.payload);
         });
       /*update*/
       }else{
-        ajaxService.updateReservation(reservationId, title, description, body, date, time).then(function(response){
-          resetReservation(reservationId);
-          defer.resolve(reservationId);
+        ajaxService.updateReservation(obj).then(function(response){
+          resetReservation(obj.reservation_id);
+          defer.resolve(obj.reservation_id);
         });
       }
       return defer.promise;

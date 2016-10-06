@@ -4,7 +4,7 @@
       <h3>{{vm.reservation.date | date: 'dd/MM/y'}} {{vm.reservation.time | time}}</h3>
       <ul>
         <li class="label label-default tag" ng-repeat="(id, tag) in vm.reservation.tags">
-          {{tag.text}} <a ng-if="vm.editEnabled" ng-disabled="vm.loading" ng-click="vm.deleteTag(tag.id)">x</a>
+          {{tag.text}}
         </li>
       </ul>
       <h1 class="title">{{vm.editEnabled ? vm.edition.title : vm.reservation.title}}</h1>
@@ -51,8 +51,12 @@
         <input class="form-control" type="date" ng-model="vm.edition.date"/>
         <label>From - To</label>
         <div class="dual-selects">
-          <select class="form-control" ng-model="vm.edition.from" ng-options="time for time in vm.times"></select>
-          <select class="form-control" ng-model="vm.edition.to" ng-options="time for time in vm.times"></select>
+          <select class="form-control" ng-model="vm.edition.from">
+            <option ng-repeat="time in vm.times" ng-value="time">{{time}}:00</option>
+          </select>
+          <select class="form-control" ng-model="vm.edition.to">
+            <option ng-repeat="time in vm.times" ng-value="time">{{time}}:00</option>
+          </select>
         </div>
       </div>
       <small ng-show="!vm.reservationValidity" class="text-danger">This date and time are already taken</small>

@@ -45,7 +45,8 @@
 			vm.loading = false;
 
 			$scope.$watch('vm.edition.date', _checkValidity);
-			$scope.$watch('vm.edition.time', _checkValidity);
+			$scope.$watch('vm.edition.from', _checkValidity);
+			$scope.$watch('vm.edition.to', _checkValidity);
 
       if(isNaN($state.params.id)){
 				vm.ableToCheckVailidity = true;
@@ -65,7 +66,7 @@
 
 		function _getTimes(){
 			var times = [];
-			for(var i=1; i<=12; i++){
+			for(var i=1; i<=24; i++){
 				times.push(i);
 			}
 			return times;
@@ -89,7 +90,8 @@
 			var day = processService.addZeros(vm.edition.date.getDate());
 			var month = processService.addZeros(vm.edition.date.getMonth() + 1);
 			var year = vm.edition.date.getFullYear();
-			var time = vm.edition.time;
+			var from = vm.edition.from;
+			var to = vm.edition.to;
 
 			if(!vm.ableToCheckVailidity){
 				return false;
@@ -98,17 +100,18 @@
 			if(vm.edition.date &&
 				 vm.reservation.date &&
 				 vm.edition.date.getTime() === vm.reservation.date.getTime() &&
-				 vm.edition.time === vm.reservation.time){
+				 vm.edition.from === vm.reservation.from &&
+			 	 vm.edition.to === vm.reservation.to){
 				vm.reservationValidity = true;
 				return true;
 			}
 
-			if(!day || !month || !year || !time){
+			if(!day || !month || !year || !from || !to){
 				vm.reservationValidity = false;
 				return false;
 			}
 
-			ajaxService.reservationValidity(day, month, year, time).then(function(response){
+			ajaxService.reservationValidity(day, month, year, from, to).then(function(response){
 				vm.reservationValidity = response.data.payload;
 			});
 		}
@@ -171,12 +174,16 @@
 		function _setReservation(){
 			vm.edition.title = vm.edition.title ? vm.edition.title : ' ';
 			vm.loading = true;
-			return storeService.setReservation(vm.edition.title,
-				 vm.edition.description,
-				 vm.edition.body,
-				 vm.edition.date,
-				 vm.edition.time,
-				 vm.reservation.id).then(function(id){
+			var obj = {
+				title:vm.edition.title,
+			  description:vm.edition.description,
+			  body:vm.edition.body,
+			  date:vm.edition.date,
+			  from:vm.edition.from,
+				to:vm.edition.to,
+			  reservation_id:vm.reservation.id
+			};
+			return storeService.setReservation(obj).then(function(id){
         if(!vm.reservation.id){
 					vm.tempId = id;
           $state.go('/reservation', {id: id}, {

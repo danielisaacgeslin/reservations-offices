@@ -63,12 +63,13 @@
 			return $http.get(url.concat('?route=getCurrentUser'));
 		}
 
-		function reservationValidity(day, month, year, time){
+		function reservationValidity(day, month, year, from, to){
 			return $http.get(url
 			.concat('?route=reservationValidity&day=').concat(day)
 			.concat('&month=').concat(month)
 			.concat('&year=').concat(year)
-			.concat('&time=').concat(time));
+			.concat('&from=').concat(from)
+			.concat('&to=').concat(to));
 		}
 
 		/*reservation_id(int)*/
@@ -97,35 +98,22 @@
 		}
 
 		/*title(string), description(string), body(string)*/
-		function saveReservation(title, description, body, date, time){
+		function saveReservation(obj){
 			return $http({
 				url:url.concat('?route=saveReservation'),
 				method: 'POST',
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-				data:$httpParamSerializerJQLike({
-					title:title,
-					description:description,
-					body:body,
-					date:date,
-					time:time
-				})
+				data:$httpParamSerializerJQLike(obj)
 			});
 		}
 
 		/*reservation_id(int), title(string), description(string), body(string)*/
-		function updateReservation(reservationId, title, description, body, date, time){
+		function updateReservation(obj){
 			return $http({
 				url:url.concat('?route=updateReservation'),
 				method: 'POST',
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-				data: $httpParamSerializerJQLike({
-					reservation_id: reservationId,
-					title:title,
-					description:description,
-					body:body,
-					date:date,
-					time:time
-				})
+				data: $httpParamSerializerJQLike(obj)
 			});
 		}
 
