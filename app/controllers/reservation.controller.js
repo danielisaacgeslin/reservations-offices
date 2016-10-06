@@ -23,12 +23,16 @@
 			vm.times = _getTimes();
 			vm.reservationValidity = true;
 			vm.currentUser = {};
+			vm.tags = {};
+			vm.spaces = {};
+			vm.lastCheck = {};
 			vm.edition = {
 				title: null,
 				description: null,
 				body: null,
-				from: 1,
-				to: 2,
+				from_time: 7,
+				to_time: 8,
+				space: 1,
 				date: new Date()
 			};
 
@@ -45,21 +49,22 @@
 			vm.loading = false;
 
 			$scope.$watch('vm.edition.date', _checkValidity);
-			$scope.$watch('vm.edition.from', _checkValidity);
-			$scope.$watch('vm.edition.to', _checkValidity);
+			$scope.$watch('vm.edition.from_time', _checkValidity);
+			$scope.$watch('vm.edition.to_time', _checkValidity);
+			$scope.$watch('vm.edition.space', _checkValidity);
 
       if(isNaN($state.params.id)){
 				vm.ableToCheckVailidity = true;
 				if($state.params.date && !isNaN($state.params.date)){
 					vm.edition.date = new Date(Number($state.params.date));
 				}
-				$q.all([_getCurrentUser(),_getTags()]).then(_filterTags);
+				$q.all([_getCurrentUser(),_getTags(),_getSpaces()]).then(_filterTags);
       }else{
         _getCurrentUser().then(_getReservation).then(function(){
 					vm.ableToCheckVailidity = true;
 					_getComments();
 					_checkValidity();
-					$q.all([_getReservationTagList(), _getTags()]).then(_filterTags);
+					$q.all([_getReservationTagList(), _getTags(),_getSpaces()]).then(_filterTags);
 				});
       }
 		}
@@ -87,31 +92,35 @@
 		}
 
 		function _checkValidity(){
+			var id = vm.reservation.id;
 			var day = processService.addZeros(vm.edition.date.getDate());
 			var month = processService.addZeros(vm.edition.date.getMonth() + 1);
 			var year = vm.edition.date.getFullYear();
-			var from = vm.edition.from;
-			var to = vm.edition.to;
+			var from = vm.edition.from_time;
+			var to = vm.edition.to_time;
+			var space = vm.edition.space;
+			var check = {
+				id: id,
+				day: day,
+				month: month,
+				year: year,
+				from: from,
+				to: to,
+				space: space
+			};
 
 			if(!vm.ableToCheckVailidity){
 				return false;
 			}
 
-			if(vm.edition.date &&
-				 vm.reservation.date &&
-				 vm.edition.date.getTime() === vm.reservation.date.getTime() &&
-				 vm.edition.from === vm.reservation.from &&
-			 	 vm.edition.to === vm.reservation.to){
-				vm.reservationValidity = true;
-				return true;
-			}
-
-			if(!day || !month || !year || !from || !to){
+			if(!day || !month || !year || !from || !to || !space || angular.equals(check, vm.lastCheck)){
 				vm.reservationValidity = false;
 				return false;
 			}
 
-			ajaxService.reservationValidity(day, month, year, from, to).then(function(response){
+			vm.lastCheck = check;
+
+			ajaxService.reservationValidity(id, day, month, year, from, to, space).then(function(response){
 				vm.reservationValidity = response.data.payload;
 			});
 		}
@@ -142,6 +151,12 @@
 		function _getTags(){
 			return storeService.getTags().then(function(tags){
 				vm.tags = tags;
+			});
+		}
+
+		function _getSpaces(){
+			return storeService.getSpaces().then(function(spaces){
+				vm.spaces = spaces;
 			});
 		}
 
@@ -179,8 +194,9 @@
 			  description:vm.edition.description,
 			  body:vm.edition.body,
 			  date:vm.edition.date,
-			  from:vm.edition.from,
-				to:vm.edition.to,
+			  from:vm.edition.from_time,
+				to:vm.edition.to_time,
+				space: vm.edition.space,
 			  reservation_id:vm.reservation.id
 			};
 			return storeService.setReservation(obj).then(function(id){

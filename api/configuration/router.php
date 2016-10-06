@@ -44,7 +44,7 @@ switch ($route) {
         break;
     case 'reservationValidity':
         $reservation = new Reservation();
-        $result = $reservation->reservationValidity($_GET['day'], $_GET['month'], $_GET['year'], $_GET['from'], $_GET['to']);
+        $result = $reservation->reservationValidity($_GET['day'], $_GET['month'], $_GET['year'], $_GET['from'], $_GET['to'], $_GET['space'], $_GET['id']);
         response(OK, $result);
         break;
     case 'getReservation':
@@ -53,12 +53,12 @@ switch ($route) {
         break;
     case 'saveReservation':
         $reservation = new Reservation();
-        $result = $reservation->setReservation($_POST['title'], $_POST['date'], $_POST['from'], $_POST['to']);
+        $result = $reservation->setReservation($_POST['title'], $_POST['date'], $_POST['from'], $_POST['to'], $_POST['space']);
         ($result ? response(OK, $result) : response(ERROR, ""));
         break;
     case 'updateReservation':
         $reservation = new Reservation();
-        $result = $reservation->updateReservation($_POST['reservation_id'], $_POST['title'], $_POST['date'], $_POST['from'], $_POST['to']);
+        $result = $reservation->updateReservation($_POST['reservation_id'], $_POST['title'], $_POST['date'], $_POST['from'], $_POST['to'], $_POST['space']);
         ($result ? response(OK, $result) : response(ERROR, ""));
         break;
     case 'deleteReservation':
@@ -75,6 +75,10 @@ switch ($route) {
         $reservation = new Reservation();
         $result = $reservation->removeTag($_POST['reservation_id'], $_POST['tag_id']);
         ($result ? response(OK, $result) : response(ERROR, ""));
+        break;
+    case 'getSpaces':
+        $spaceList = new SpaceList();
+        response(OK,$spaceList->getSpaces());
         break;
     case 'getReservationList':
         $reservationList = new ReservationList();

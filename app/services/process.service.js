@@ -29,6 +29,9 @@
 					if(key === 'DATE'){
 						value = new Date(value.replace('-','/').replace('-','/'));
 					}
+					if(!isNaN(value) && typeof value === 'string' && value.trim()){
+						value = Number(value);
+					}
           tempObj[key.toLowerCase()] = value;
         }
         dbObject[tempObj.id] = tempObj;

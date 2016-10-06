@@ -4,7 +4,7 @@
       <h3>{{vm.reservation.date | date: 'dd/MM/y'}} {{vm.reservation.time | time}}</h3>
       <ul>
         <li class="label label-default tag" ng-repeat="(id, tag) in vm.reservation.tags">
-          {{tag.text}}
+          {{tag.text}} <a ng-if="vm.editEnabled" ng-disabled="vm.loading" ng-click="vm.deleteTag(tag.id)">x</a>
         </li>
       </ul>
       <h1 class="title">{{vm.editEnabled ? vm.edition.title : vm.reservation.title}}</h1>
@@ -51,13 +51,15 @@
         <input class="form-control" type="date" ng-model="vm.edition.date"/>
         <label>From - To</label>
         <div class="dual-selects">
-          <select class="form-control" ng-model="vm.edition.from">
-            <option ng-repeat="time in vm.times" ng-value="time">{{time}}:00</option>
+          <select class="form-control" ng-model="vm.edition.from_time" ng-options="time + ':00 hs' for time in vm.times">
           </select>
-          <select class="form-control" ng-model="vm.edition.to">
-            <option ng-repeat="time in vm.times" ng-value="time">{{time}}:00</option>
+          <select class="form-control" ng-model="vm.edition.to_time" ng-options="time + ':00 hs' for time in vm.times">
           </select>
         </div>
+        <label>Space</label>
+        <select class="form-control"
+        ng-model="vm.edition.space"
+        ng-options="value.id as value.text for (key, value) in vm.spaces"></select>
       </div>
       <small ng-show="!vm.reservationValidity" class="text-danger">This date and time are already taken</small>
       <label>Description</label>
@@ -65,15 +67,15 @@
       <!--
       <label>Body</label>
       <textarea class="form-control" ng-model="vm.edition.body"></textarea>-->
-      <button ng-disabled="vm.loading" ng-click="vm.saveReservation()" ng-disabled="!vm.reservationValidity" class="btn btn-primary col-xs-12">Save</button>
+      <button ng-disabled="vm.loading || !vm.reservationValidity" ng-click="vm.saveReservation()" ng-disabled="!vm.reservationValidity" class="btn btn-primary col-xs-12">Save</button>
     </div>
     <div>
-      <h5>Spaces</h5>
+      <h5>Tags</h5>
       <select ng-selected="$last"
               class="form-control"
               ng-options="tag as tag.text for tag in vm.filteredTags track by tag.id"
               ng-model="vm.selectedTag"></select>
-      <button ng-disabled="vm.loading" ng-click="vm.setTag()" ng-disabled="vm.filteredTags[0]" class="btn btn-default pull-right">Add Tag</button>
+      <button ng-disabled="vm.loading || vm.filteredTags[0] || !vm.reservation.id" ng-click="vm.setTag()" class="btn btn-default pull-right">Add Tag</button>
     </div>
   </div>
 </div>

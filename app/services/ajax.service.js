@@ -20,6 +20,7 @@
 			logout: logout,
 			reservationValidity: reservationValidity,
 			getCurrentUser: getCurrentUser,
+			getSpaces: getSpaces,
 			/*POST*/
 			saveReservation: saveReservation, // title(string), description(string), body(string), date(string), time(int)
 			updateReservation: updateReservation, // reservation_id, title, description, body, date, time
@@ -63,13 +64,15 @@
 			return $http.get(url.concat('?route=getCurrentUser'));
 		}
 
-		function reservationValidity(day, month, year, from, to){
+		function reservationValidity(id, day, month, year, from, to, space){
 			return $http.get(url
 			.concat('?route=reservationValidity&day=').concat(day)
 			.concat('&month=').concat(month)
 			.concat('&year=').concat(year)
 			.concat('&from=').concat(from)
-			.concat('&to=').concat(to));
+			.concat('&to=').concat(to)
+			.concat('&space=').concat(space)
+			.concat('&id=').concat(id));
 		}
 
 		/*reservation_id(int)*/
@@ -95,6 +98,10 @@
 		/*N/A*/
 		function getTags(){
 			return $http.get(url.concat('?route=getTags'));
+		}
+
+		function getSpaces(){
+			return $http.get(url.concat('?route=getSpaces'));
 		}
 
 		/*title(string), description(string), body(string)*/

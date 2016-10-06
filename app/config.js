@@ -25,8 +25,8 @@
       controller: 'reservationController',
       controllerAs: 'vm',
 			resolve: {ping: ping}
-		}).state('/spaces', {
-			url : '/spaces',
+		}).state('/tags', {
+			url : '/tags',
       templateUrl : 'tags.html',
       controller: 'tagsController',
       controllerAs: 'vm',

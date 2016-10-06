@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 06-10-2016 a las 15:26:32
+-- Tiempo de generación: 06-10-2016 a las 19:25:50
 -- Versión del servidor: 10.1.13-MariaDB
 -- Versión de PHP: 7.0.8
 
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `reservations`
+-- Base de datos: `reservations_offices`
 --
 
 -- --------------------------------------------------------
@@ -47,11 +47,34 @@ CREATE TABLE `reservations` (
   `TITLE` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
   `DESCRIPTION` varchar(350) COLLATE utf8_unicode_ci DEFAULT NULL,
   `BODY` text COLLATE utf8_unicode_ci,
+  `SPACE` int(11) NOT NULL,
   `DATE` date NOT NULL,
-  `TIME` tinyint(4) NOT NULL,
+  `FROM_TIME` int(11) NOT NULL,
+  `TO_TIME` int(11) NOT NULL,
   `CREATION_USER` int(11) NOT NULL,
   `EDITION_USER` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `spaces`
+--
+
+CREATE TABLE `spaces` (
+  `ID` int(11) NOT NULL,
+  `TEXT` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `CREATION_TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATION_USER` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `spaces`
+--
+
+INSERT INTO `spaces` (`ID`, `TEXT`, `CREATION_TIMESTAMP`, `CREATION_USER`) VALUES
+(1, 'MARIO ROOM', '2016-10-06 17:23:30', 1),
+(2, 'SONIC ROOM', '2016-10-06 17:23:30', 1);
 
 -- --------------------------------------------------------
 
@@ -65,6 +88,14 @@ CREATE TABLE `tags` (
   `CREATION_TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `CREATION_USER` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `tags`
+--
+
+INSERT INTO `tags` (`ID`, `TEXT`, `CREATION_TIMESTAMP`, `CREATION_USER`) VALUES
+(4, 'MEETING', '2016-10-06 13:31:20', 1),
+(5, 'TRAINING', '2016-10-06 13:31:20', 1);
 
 -- --------------------------------------------------------
 
@@ -133,7 +164,16 @@ ALTER TABLE `reservations`
   ADD KEY `CREATION_USER_2` (`CREATION_USER`),
   ADD KEY `CREATION_USER_3` (`CREATION_USER`),
   ADD KEY `CREATION_USER_4` (`CREATION_USER`),
-  ADD KEY `EDITION_USER_2` (`EDITION_USER`);
+  ADD KEY `EDITION_USER_2` (`EDITION_USER`),
+  ADD KEY `SPACE` (`SPACE`);
+
+--
+-- Indices de la tabla `spaces`
+--
+ALTER TABLE `spaces`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `TEXT` (`TEXT`),
+  ADD KEY `CREATION_USER` (`CREATION_USER`);
 
 --
 -- Indices de la tabla `tags`
@@ -169,22 +209,27 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 --
 -- AUTO_INCREMENT de la tabla `reservations`
 --
 ALTER TABLE `reservations`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+--
+-- AUTO_INCREMENT de la tabla `spaces`
+--
+ALTER TABLE `spaces`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT de la tabla `tags`
 --
 ALTER TABLE `tags`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT de la tabla `tag_lists`
 --
 ALTER TABLE `tag_lists`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 --
 -- AUTO_INCREMENT de la tabla `users`
 --
@@ -207,6 +252,12 @@ ALTER TABLE `comments`
 ALTER TABLE `reservations`
   ADD CONSTRAINT `RESERVATIONS_ibfk_1` FOREIGN KEY (`CREATION_USER`) REFERENCES `users` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `RESERVATIONS_ibfk_2` FOREIGN KEY (`EDITION_USER`) REFERENCES `users` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `spaces`
+--
+ALTER TABLE `spaces`
+  ADD CONSTRAINT `spaces_ibfk_1` FOREIGN KEY (`CREATION_USER`) REFERENCES `users` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `tags`

@@ -5,7 +5,7 @@
 	storeService.$inject = ['ajaxService', 'processService', '$q'];
 
 	function storeService(ajaxService, processService, $q) {
-    var reservations = {}, comments = {}, tags = {}, currentUser = {};
+    var reservations = {}, comments = {}, tags = {}, spaces = {}, currentUser = {};
 
 		var currentUserDefer = null;
 
@@ -16,6 +16,7 @@
       getComments: getComments,
       getTags: getTags,
 			getCurrentUser: getCurrentUser,
+			getSpaces: getSpaces,
 
       setReservation: setReservation,
       setTag: setTag,
@@ -130,6 +131,19 @@
 				ajaxService.getTags().then(function(response){
 					tags = Object.assign(processService.dbArrayAdapter(response.data.payload), tags);
 					defer.resolve(tags);
+				});
+			}
+      return defer.promise;
+    }
+
+		function getSpaces(){
+      var defer = $q.defer();
+			if(Object.keys(spaces).length){
+				defer.resolve(spaces);
+			}else{
+				ajaxService.getSpaces().then(function(response){
+					spaces = Object.assign(processService.dbArrayAdapter(response.data.payload), spaces);
+					defer.resolve(spaces);
 				});
 			}
       return defer.promise;

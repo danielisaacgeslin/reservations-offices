@@ -2,4 +2,4 @@
              'label-success': item.creation_user === user.id,
              'label-info': item.creation_user !== user.id,
              'label-danger': !checkVaidity(item.date)
-           }" ng-repeat="item in day.items track by item.id"><a class="pull-left" href="#/reservation/{{item.id}}/{{item.date | dateToNumber}}">{{item.time | time}} | {{item.first_name}} {{item.last_name}} </a><a class="pull-right" ng-show="item.creation_user === user.id && checkVaidity(item.date)" ng-click="delete(item.id)">x</a></p></div></article></div></div>
+           }" ng-repeat="item in day.items track by item.id"><a class="pull-left" href="#/reservation/{{item.id}}/{{item.date | dateToNumber}}">{{item.from_time}} to {{item.to_time}} | {{item.first_name}} {{item.last_name}} </a><a class="pull-right" ng-show="item.creation_user === user.id && checkVaidity(item.date)" ng-click="delete(item.id)">x</a></p></div></article></div></div>

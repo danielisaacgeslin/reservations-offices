@@ -2,16 +2,12 @@
 
 class Reservation {
 
-    public function reservationValidity($day, $month, $year, $from, $to){
+    public function reservationValidity($day, $month, $year, $from, $to, $space, $id){
         $now = (int) (date('Y').date('m').date('d'));
         $date = (int) ($year.$month.$day);
 
-        if($date < $now){
+        if($date < $now or $to < $from or $to === $from){
             return false;
-        }
-
-        if($to < $from or $to === $from){
-          return false;
         }
 
         $rule_one = '(FROM_TIME > :from_time AND TO_TIME > :to_time AND FROM_TIME < :to_time)';
@@ -20,7 +16,7 @@ class Reservation {
         $rule_four = '(FROM_TIME <= :from_time AND TO_TIME >= :to_time)';
 
         $link = Connection::connect();
-        $query = 'SELECT ID FROM RESERVATIONS WHERE '
+        $query = 'SELECT ID FROM RESERVATIONS WHERE SPACE = :space AND '
                 . 'DAY(DATE) = :day AND MONTH(DATE) = :month AND YEAR(DATE) = :year '
                 . 'AND (' . $rule_one . ' OR ' . $rule_two . ' OR ' . $rule_three . ' OR '. $rule_four . ')';
         $stmt = $link->prepare($query);
@@ -30,31 +26,33 @@ class Reservation {
         $stmt->bindParam(':year', $year, PDO::PARAM_INT);
         $stmt->bindParam(':from_time', $from, PDO::PARAM_INT);
         $stmt->bindParam(':to_time', $to, PDO::PARAM_INT);
+        $stmt->bindParam(':space', $space, PDO::PARAM_INT);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        if($result){
+        if($result and $result['ID'] != $id){
             return false;
         }else{
             return true;
         }
     }
 
-    public function setReservation($title, $date, $from, $to) {
+    public function setReservation($title, $date, $from, $to, $space) {
         $creation_user = $_SESSION["ID"];
-        if (!isset($title) or ! isset($date) or ! isset($from) or !isset($to)) {
+        if (!isset($title) or ! isset($date) or ! isset($from) or !isset($to) or !isset($space)) {
             return false;
         }
 
         $link = Connection::connect();
         $query = 'INSERT INTO RESERVATIONS '
-                . '(TITLE, DATE, FROM_TIME, TO_TIME, CREATION_USER) '
-                . 'VALUES (:title, :date, :from_time, :to_time, :creation_user)';
+                . '(TITLE, DATE, FROM_TIME, TO_TIME, SPACE, CREATION_USER) '
+                . 'VALUES (:title, :date, :from_time, :to_time, :space, :creation_user)';
         $stmt = $link->prepare($query);
 
         $stmt->bindParam(':title', $title, PDO::PARAM_STR);
         $stmt->bindParam(':date', $date, PDO::PARAM_STR);
         $stmt->bindParam(':from_time', $from, PDO::PARAM_INT);
         $stmt->bindParam(':to_time', $to, PDO::PARAM_INT);
+        $stmt->bindParam(':space', $space, PDO::PARAM_INT);
         $stmt->bindParam(':creation_user', $creation_user, PDO::PARAM_INT);
 
         if ($stmt->execute()) {
@@ -64,16 +62,17 @@ class Reservation {
         }
     }
 
-    public function updateReservation($reservation_id, $title, $date, $from, $to) {
+    public function updateReservation($reservation_id, $title, $date, $from, $to, $space) {
+      var_dump($space);
         $user = $_SESSION["ID"];
-        if (!isset($reservation_id) or ! isset($title) or ! isset($date) or ! isset($from) or !isset($to)) {
+        if (!isset($reservation_id) or ! isset($title) or ! isset($date) or ! isset($from) or !isset($to) or !isset($space)) {
             return false;
         }
 
         $link = Connection::connect();
         $query = 'UPDATE RESERVATIONS SET '
                 . 'TITLE = :title, DATE = :date, FROM_TIME = :from_time, TO_TIME = :to_time, '
-                . 'EDITION_USER = :edition_user, EDITION_TIMESTAMP = CURRENT_TIMESTAMP '
+                . 'EDITION_USER = :edition_user, EDITION_TIMESTAMP = CURRENT_TIMESTAMP, SPACE = :space '
                 . 'WHERE ID = :reservation_id AND CREATION_USER = :user';
         $stmt = $link->prepare($query);
 
@@ -82,6 +81,7 @@ class Reservation {
         $stmt->bindParam(':date', $date, PDO::PARAM_STR);
         $stmt->bindParam(':from_time', $from, PDO::PARAM_INT);
         $stmt->bindParam(':to_time', $to, PDO::PARAM_INT);
+        $stmt->bindParam(':space', $space, PDO::PARAM_INT);
         $stmt->bindParam(':edition_user', $user, PDO::PARAM_INT);
         $stmt->bindParam(':user', $user, PDO::PARAM_INT);
 
