@@ -1,0 +1,182 @@
+/*general*/
+.transition {transition:All 0.2s ease-in-out; -webkit-transition:All 0.2s ease-in-out; -moz-transition:All 0.2s ease-in-out; -o-transition:All 0.2s ease-in-out;}
+
+body {
+  position:relative;
+}
+
+a, [ng-click] {
+  cursor:pointer;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.center {
+  display:block;
+  margin:auto;
+}
+
+#reservation-list {
+  .picker {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    p {
+      padding: 9px;
+    }
+  }
+  .title {
+    min-width:75px;
+    word-break:break-all;
+  }
+  .switch {
+    width:160px;
+    margin: 15px auto;
+  }
+}
+
+#reservation {
+  .content-edition {
+    margin-bottom:15px;
+    label {
+      margin-top:5px;
+    }
+    .dual-selects{
+      select {
+        width:49%;
+        display: inline-block;
+      }
+      select:first-child {
+        margin-right: 2%;
+      }
+    }
+  }
+  .comment-text {
+    display:block;
+    margin-top:5px;
+  }
+  ul {
+    margin:0;
+    padding:0;
+    list-style: none;
+  }
+  article {
+    .title {
+      word-break:break-all;
+    }
+    .description {
+
+    }
+    .body {
+      min-height: 200px;
+      margin-bottom:15px;
+    }
+  }
+  .tag {
+    margin-right:5px;
+    a {
+      padding:0 3px;
+    }
+  }
+  textarea {
+    min-height:150px;
+  }
+  button {
+    margin-top:10px;
+  }
+  .comments {
+    .new-comment {
+      word-break:break-all;
+    }
+    .delete {
+      padding:0 5px;
+      font-weight:bold;
+      margin-right:5px;
+      vertical-align: initial;
+    }
+    .edit {
+      padding:0 5px;
+      margin-left: 5px;
+    }
+    .comment-edit {
+      margin-top:10px;
+      input {
+        word-break:break-all;
+      }
+      textarea {
+        min-height:75px;
+      }
+    }
+  }
+}
+
+footer.well {
+  margin-top: 30px;
+  margin-bottom: 0;
+  padding: 10px 0;
+}
+
+.calendar-directive {
+  .day {
+    float:none;
+    display:inline-block;
+    vertical-align: top;
+    padding: 5px;
+    @media(min-width: 992px){
+      width: percentage(1/7);
+    }
+    article {
+      min-height:120px;
+      margin: 0;
+      .panel-heading {
+        a {
+          color:inherit;
+        }
+      }
+      .panel-body {
+        padding:4px;
+        p {
+          float:left;
+          width:100%;
+          margin:2px 0;
+          padding:5px;
+          display:block;
+        }
+        a {
+          text-align: left;
+          color: inherit;
+        }
+      }
+    }
+  }
+}
+
+#login {
+  margin-top:50px;
+  margin-bottom:50px;
+  input {
+    margin-top:25px;
+  }
+  button{
+    width:100%;
+    display: block;
+    margin-top:25px;
+  }
+  p {
+    padding-top:15px;
+  }
+  .panel-body {
+    padding-top:10px;
+    padding-bottom:25px;
+  }
+}
+
+.toaster {
+  position:fixed;
+  bottom: 15px;
+  right:15px;
+  .alert {
+    margin:0;
+  }
+}
