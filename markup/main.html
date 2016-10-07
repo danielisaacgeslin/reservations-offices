@@ -40,7 +40,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="(id, reservation) in vm.reservations | monthFilter : vm.date">
+        <tr ng-repeat="(id, reservation) in vm.reservations | monthFilter : vm.date | repeatObjectToArrayFilter:['from_time','date']">
           <td>{{$index + 1}}</td>
           <td>{{reservation.id}}</td>
           <td>{{reservation.date | date: 'dd/MM/y'}}</td>

@@ -13,6 +13,7 @@ require('./filters/month.filter');
 require('./filters/dateToNumber.filter');
 require('./filters/fromTime.filter');
 require('./filters/toTime.filter');
+require('./filters/repeatObjectToArray.filter');
 /*directives*/
 require('./directives/toaster.directive');
 require('./directives/calendar.directive');
