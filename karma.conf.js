@@ -15,7 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      './bower_components/angular',
+      //'./bower_components/angular',
       //'./bower_components/angular-ui-router/release/angular-ui-router.js',
       //'./bower_components/angular-animate',
       //'./bower_components/angular-bootstrap',

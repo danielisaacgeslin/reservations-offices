@@ -1,3 +1,4 @@
 
-1 lint errors found in app\filters\fromTime.filter.js
-  [10,11](W117) 'splice' is not defined.
+2 lint errors found in test\services\interceptor.spec.js
+  [17,33](W117) 'data' is not defined.
+  [17,48](W117) 'data' is not defined.
