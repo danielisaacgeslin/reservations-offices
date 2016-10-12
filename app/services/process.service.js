@@ -1,43 +1,38 @@
-(function(){
-	'use strict';
-	angular.module('app').factory('processService', processService);
-
-	processService.$inject = [];
-
-	function processService() {
-		return {
-      dbArrayAdapter: dbArrayAdapter,
-			addZeros: addZeros
-    };
-
-		function addZeros(number){
-			return number < 10 ? '0'.concat(number) : number;
-		}
-
-    function dbArrayAdapter(dbArray){
-      var dbObject = {}, tempObj = {}, value;
-      if(typeof dbArray !== 'object'){
-        return tempObj;
-      }
-      dbArray.forEach(function(object){
-        tempObj = {};
-        for(var key in object){
-          value = object[key];
-          if(new RegExp('timestamp','i').test(key)){
-            value = new Date(value);
-          }
-					if(key === 'DATE'){
-						value = new Date(value.replace('-','/').replace('-','/'));
-					}
-					if(!isNaN(value) && typeof value === 'string' && value.trim()){
-						value = Number(value);
-					}
-          tempObj[key.toLowerCase()] = value;
+(function () {
+    'use strict';
+    angular.module('app').factory('processService', processService);
+    processService.$inject = [];
+    function processService() {
+        return {
+            dbArrayAdapter: dbArrayAdapter,
+            addZeros: addZeros
+        };
+        function addZeros(number) {
+            return number < 10 ? '0'.concat(number) : number;
         }
-        dbObject[tempObj.id] = tempObj;
-      });
-      return dbObject;
+        function dbArrayAdapter(dbArray) {
+            var dbObject = {}, tempObj = {}, value;
+            if (typeof dbArray !== 'object') {
+                return tempObj;
+            }
+            dbArray.forEach(function (object) {
+                tempObj = {};
+                for (var key in object) {
+                    value = object[key];
+                    if (new RegExp('timestamp', 'i').test(key)) {
+                        value = new Date(value);
+                    }
+                    if (key === 'DATE') {
+                        value = new Date(value.replace('-', '/').replace('-', '/'));
+                    }
+                    if (!isNaN(value) && typeof value === 'string' && value.trim()) {
+                        value = Number(value);
+                    }
+                    tempObj[key.toLowerCase()] = value;
+                }
+                dbObject[tempObj.id] = tempObj;
+            });
+            return dbObject;
+        }
     }
-
-	}
 })();

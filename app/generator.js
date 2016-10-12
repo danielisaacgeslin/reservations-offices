@@ -1,12 +1,10 @@
-/*modules*/
+'use strict';
 require('./modules/app.module');
 require('./config');
-/*services*/
 require('./services/interceptor.service');
 require('./services/process.service');
 require('./services/ajax.service');
 require('./services/store.service');
-/*filters*/
 require('./filters/time.filter');
 require('./filters/department.filter');
 require('./filters/month.filter');
@@ -14,10 +12,8 @@ require('./filters/dateToNumber.filter');
 require('./filters/fromTime.filter');
 require('./filters/toTime.filter');
 require('./filters/repeatObjectToArray.filter');
-/*directives*/
 require('./directives/toaster.directive');
 require('./directives/calendar.directive');
-/*controllers*/
 require('./controllers/app.controller');
 require('./controllers/login.controller');
 require('./controllers/main.controller');

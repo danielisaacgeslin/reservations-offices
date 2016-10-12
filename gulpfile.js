@@ -9,8 +9,12 @@ var htmlmin = require('gulp-htmlmin');
 var imagemin = require('gulp-imagemin');
 var connect = require('gulp-connect');
 var jshint = require('gulp-jshint');
+var ngAnnotate = require('gulp-ng-annotate')
 var runSequence = require('run-sequence');
+var ts = require('gulp-typescript');
 var Server = require('karma').Server;
+
+var tsProject = ts.createProject('tsconfig.json');
 
 /*usable from terminal*/
 gulp.task('default', function(){
@@ -18,11 +22,11 @@ gulp.task('default', function(){
 });
 
 gulp.task('dev', function(){
-  runSequence('build', 'lint', 'test', 'watch');
+  runSequence('build', 'lint', 'test', 'connect', 'watch');
 });
 
 gulp.task('build', function(){
-  runSequence('build-main','libs','build-app','build-css','minify-html','images','fonts', 'lint');
+  runSequence('build-main','libs','ts','build-app','build-css','minify-html','images','fonts', 'lint');
 });
 
 /*end usable from terminal*/
@@ -43,7 +47,7 @@ gulp.task('test', function (done) {
 });
 
 gulp.task('lint', function() {
-  return gulp.src(['./app/**/*.js','./test/**/*.js'])
+  return gulp.src(['./app/**/*.js'])
     .pipe(jshint())
     .pipe(jshint.reporter('gulp-jshint-file-reporter', {
       filename: './jshint-output.log'
@@ -65,7 +69,8 @@ gulp.task('browserify', function() {
 
 gulp.task('minify-js', function() {
   return gulp.src('public/js/app.js')
-    .pipe(uglify({mangle:false}))
+    .pipe(ngAnnotate())
+    .pipe(uglify({mangle:true}))
     .pipe(gulp.dest('public/js/'));
 });
 
@@ -128,11 +133,18 @@ gulp.task('build-main', function(){
   runSequence('main','minify-main');
 });
 
+gulp.task('ts', function(){
+  return gulp.src(['./typings/**/*.ts','./app/**/*.ts'])
+  .pipe(tsProject())
+  .pipe(gulp.dest('./app'));
+});
+
 gulp.task('watch', function(){
 	gulp.watch('libs/**/*.*', ['libs']);
-	gulp.watch('app/**/*.js', ['brows-dev','lint']);
+  gulp.watch('app/**/*.ts', ['ts']);
+  gulp.watch('app/**/*.js', ['brows-dev','lint']);
 	gulp.watch('./sass/*.scss', [ 'build-css' ]);
 	gulp.watch('markup/**/*.html', ['minify-html']);
 	gulp.watch('images/**/*', ['images']);
-  gulp.watch(['app/**/*.js', 'test/**/*.js'], ['test', 'lint']);
+  gulp.watch(['app/**/*.js'], ['test', 'lint']);
 });
