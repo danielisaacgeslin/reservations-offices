@@ -2,7 +2,7 @@
     'use strict';
 
     class SpacesController {
-        static $inject: any[] = ['$scope', 'storeService'];
+        static $inject: string[] = ['$scope', 'storeService'];
         public spaces: Object;
 
         constructor(private $scope: ng.IScope, private storeService: any) {

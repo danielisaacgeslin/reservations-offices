@@ -2,6 +2,7 @@
     'use strict';
     var MainController = (function () {
         function MainController($scope, $q, $rootScope, $state, $uibModal, storeService) {
+            var _this = this;
             this.$scope = $scope;
             this.$q = $q;
             this.$rootScope = $rootScope;
@@ -13,15 +14,12 @@
             this.reservations = {};
             this.reservationCount = 0;
             this.loading = false;
-            this.init();
-        }
-        MainController.prototype.init = function () {
-            var _this = this;
             this.getReservationList();
             this.storeService.getCurrentUser().then(function (user) {
                 _this.currentUser = user;
             });
-        };
+            this.$scope.$on('deleteReservation', this.deleteReservation.bind(this));
+        }
         MainController.prototype.toastSuccess = function () {
             var defer = this.$q.defer();
             this.$rootScope.$broadcast('OK', '');
@@ -38,7 +36,7 @@
                 _this.loading = false;
             });
         };
-        MainController.prototype.deleteReservation = function (reservationId) {
+        MainController.prototype.deleteReservation = function (e, reservationId) {
             var _this = this;
             var date = this.reservations[reservationId].date;
             var title = 'About to delete a reservation';
@@ -61,7 +59,7 @@
                 }
             });
             modalInstance.result.then(function () {
-                _this.storeService.deleteReservation(reservationId).then(_this.toastSuccess).then(function () {
+                _this.storeService.deleteReservation(reservationId).then(_this.toastSuccess.bind(_this)).then(function () {
                     _this.$scope.$broadcast('updateCalendar');
                 });
             });

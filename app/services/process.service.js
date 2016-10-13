@@ -4,7 +4,7 @@
         function ProcessService() {
         }
         ProcessService.prototype.addZeros = function (number) {
-            return (number < 10 ? '0'.concat(number.toString()) : number.toString);
+            return (number < 10 ? '0'.concat(number.toString()) : number.toString());
         };
         ProcessService.prototype.dbArrayAdapter = function (dbArray) {
             var dbObject = {};

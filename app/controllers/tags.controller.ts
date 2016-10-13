@@ -2,7 +2,7 @@
     'use strict';
 
     class TagsController {
-        static $inject: any[] = ['$scope', 'storeService'];
+        static $inject: string[] = ['$scope', 'storeService'];
         public tags: Object;
 
         constructor(private $scope: ng.IScope, private storeService: any) {

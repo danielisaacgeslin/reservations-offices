@@ -1,20 +1,20 @@
 (function () {
     'use strict';
-    angular.module('app').controller('confirmationModalController', confirmationModalController);
-    confirmationModalController.$inject = ['$scope', '$uibModalInstance', 'data'];
-    function confirmationModalController($scope, $uibModalInstance, data) {
-        var vm = this;
-        vm.data = data;
-        vm.cancel = cancel;
-        vm.accept = accept;
-        _activate();
-        function _activate() {
+    var ConfirmationModalController = (function () {
+        function ConfirmationModalController($scope, $uibModalInstance, data) {
+            this.$scope = $scope;
+            this.$uibModalInstance = $uibModalInstance;
+            this.data = data;
+            this.data = data;
         }
-        function cancel() {
-            $uibModalInstance.dismiss('delete');
-        }
-        function accept() {
-            $uibModalInstance.close();
-        }
-    }
+        ConfirmationModalController.prototype.cancel = function () {
+            this.$uibModalInstance.dismiss('delete');
+        };
+        ConfirmationModalController.prototype.accept = function () {
+            this.$uibModalInstance.close();
+        };
+        ConfirmationModalController.$inject = ['$scope', '$uibModalInstance', 'data'];
+        return ConfirmationModalController;
+    }());
+    angular.module('app').controller('confirmationModalController', ConfirmationModalController);
 })();

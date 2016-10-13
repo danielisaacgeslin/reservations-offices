@@ -3,27 +3,34 @@
     angular.module('app').directive('toaster', toaster);
     toaster.$inject = ['constants'];
     function toaster(constants) {
+        var Link = (function () {
+            function Link($scope, $element, $attr) {
+                this.$scope = $scope;
+                this.$element = $element;
+                this.timeout = 0;
+                this.$scope.$watch('data', this.toast.bind(this));
+            }
+            Link.prototype.toast = function () {
+                var _this = this;
+                if (!this.$scope.data.type) {
+                    return false;
+                }
+                clearTimeout(this.timeout);
+                this.timeout = setTimeout(function () {
+                    _this.$scope.data = {};
+                    _this.$scope.$digest();
+                }, constants.toasterTime);
+                return true;
+            };
+            return Link;
+        }());
         return {
             restrict: 'E',
             templateUrl: 'toaster.directive.html',
-            link: link,
+            link: Link,
             scope: {
                 data: '='
             }
         };
-        function link($scope, $element, $attr) {
-            var timeout = 0;
-            $scope.$watch('data', _toast);
-            function _toast() {
-                if (!$scope.data.type) {
-                    return false;
-                }
-                clearTimeout(timeout);
-                timeout = setTimeout(function () {
-                    $scope.data = {};
-                    $scope.$digest();
-                }, constants.toasterTime);
-            }
-        }
     }
 })();

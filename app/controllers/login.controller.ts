@@ -1,37 +1,32 @@
-(function(){
-	'use strict';
-	angular.module('app').controller('loginController', loginController);
+(() => {
+    'use strict';
 
-	loginController.$inject = ['$scope', '$state', 'storeService', 'ajaxService'];
+    class LoginController {
+        static $inject: string[] = ['$scope', '$state', 'storeService', 'ajaxService'];
+        public status: string;
+        public username: string;
+        public password: string;
 
-	function loginController($scope, $state, storeService, ajaxService) {
-		var vm = this;
-    vm.status = null;
-    vm.username = null;
-    vm.password = null;
-
-    vm.login = login;
-
-    _activate();
-
-		/*private functions*/
-		function _activate(){
-			
-		}
-
-		/*end private functions*/
-
-		/*public functions*/
-    function login(){
-      vm.status = null;
-      ajaxService.login(vm.username, vm.password).then(function(response){
-        if(response.data.status === 'ERROR'){
-          vm.status = response.data.payload;
-        }else{
-          $state.go('/');
+        constructor(
+            public $scope: ng.IScope,
+            private $state: ng.ui.IStateService,
+            private storeService: any,
+            private ajaxService: any) {
         }
-      });
+
+        /*public functions*/
+        public login(): void {
+            this.status = null;
+            this.ajaxService.login(this.username, this.password).then((response: any) => {
+                if (response.data.status === 'ERROR') {
+                    this.status = response.data.payload;
+                } else {
+                    this.$state.go('/');
+                }
+            });
+        }
+        /*end public functions*/
     }
-		/*end public functions*/
-	}
+
+    angular.module('app').controller('loginController', LoginController);
 })();

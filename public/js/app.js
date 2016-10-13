@@ -58,110 +58,121 @@
 },{}],2:[function(require,module,exports){
 (function () {
     'use strict';
-    angular.module('app').controller('appController', appController);
-    appController.$inject = ['$scope', '$state', 'storeService', 'ajaxService', 'constants'];
-    function appController($scope, $state, storeService, ajaxService, constants) {
-        var vm = this;
-        vm.route = null;
-        vm.currentUser = {};
-        vm.toasterData = {};
-        vm.logout = logout;
-        _activate();
-        $scope.$watch(function () { return $state.current; }, _updateRoute);
-        $scope.$on('ERROR', _toastError);
-        $scope.$on('OK', _toastSuccess);
-        $scope.$on('goToLogin', _goToLogin);
-        $scope.$on('goToRoot', _goToRoot);
-        function _activate() {
-            _updateRoute();
+    var AppController = (function () {
+        function AppController($scope, $state, storeService, ajaxService, constants) {
+            this.$scope = $scope;
+            this.$state = $state;
+            this.storeService = storeService;
+            this.ajaxService = ajaxService;
+            this.constants = constants;
+            this.currentUser = {};
+            this.toasterData = {};
+            this.init();
         }
-        function _goToLogin() {
-            $state.go('/login');
-        }
-        function _goToRoot() {
-            $state.go('/');
-        }
-        function _toastError(e, data) {
+        AppController.prototype.init = function () {
+            var _this = this;
+            this.$scope.$watch(function () { return _this.$state.current; }, this.updateRoute.bind(this));
+            this.$scope.$on('ERROR', this.toastError.bind(this));
+            this.$scope.$on('OK', this.toastSuccess.bind(this));
+            this.$scope.$on('goToLogin', this.goToLogin.bind(this));
+            this.$scope.$on('goToRoot', this.goToRoot.bind(this));
+            this.updateRoute();
+        };
+        AppController.prototype.goToLogin = function () {
+            this.$state.go('/login');
+        };
+        AppController.prototype.goToRoot = function () {
+            this.$state.go('/');
+        };
+        AppController.prototype.toastError = function (e, data) {
             var type = e.name;
-            var message = data ? data : constants.genericErrorMessage;
-            vm.toasterData = { type: type, message: message };
-        }
-        function _toastSuccess(e, data) {
+            var message = data ? data : this.constants.genericErrorMessage;
+            this.toasterData = { type: type, message: message };
+        };
+        AppController.prototype.toastSuccess = function (e, data) {
             var type = e.name;
-            var message = data ? data : constants.genericSuccessMessage;
-            vm.toasterData = { type: type, message: message };
-        }
-        function _updateRoute() {
-            if (!$state.current.name || $state.current.name === '/login') {
-                storeService.resetCurrentUser();
-                vm.currentUser = {};
+            var message = data ? data : this.constants.genericSuccessMessage;
+            this.toasterData = { type: type, message: message };
+        };
+        AppController.prototype.updateRoute = function () {
+            var _this = this;
+            if (!this.$state.current.name || this.$state.current.name === '/login') {
+                this.storeService.resetCurrentUser();
+                this.currentUser = {};
                 return false;
             }
-            _getCurrentUser().then(function () {
-                vm.route = $state.current.name;
+            this.getCurrentUser().then(function () {
+                _this.route = _this.$state.current.name;
+                return true;
             });
-        }
-        function _getCurrentUser() {
-            return storeService.getCurrentUser().then(function (currentUser) {
-                vm.currentUser = currentUser;
+            return true;
+        };
+        AppController.prototype.getCurrentUser = function () {
+            var _this = this;
+            return this.storeService.getCurrentUser().then(function (currentUser) {
+                _this.currentUser = currentUser;
             });
-        }
-        function logout() {
-            storeService.logout().then(function () {
-                $state.go('/login');
+        };
+        AppController.prototype.logout = function () {
+            var _this = this;
+            this.storeService.logout().then(function () {
+                _this.$state.go('/login');
             });
-        }
-    }
+        };
+        AppController.$inject = ['$scope', '$state', 'storeService', 'ajaxService', 'constants'];
+        return AppController;
+    }());
+    angular.module('app').controller('appController', AppController);
 })();
 
 },{}],3:[function(require,module,exports){
 (function () {
     'use strict';
-    angular.module('app').controller('confirmationModalController', confirmationModalController);
-    confirmationModalController.$inject = ['$scope', '$uibModalInstance', 'data'];
-    function confirmationModalController($scope, $uibModalInstance, data) {
-        var vm = this;
-        vm.data = data;
-        vm.cancel = cancel;
-        vm.accept = accept;
-        _activate();
-        function _activate() {
+    var ConfirmationModalController = (function () {
+        function ConfirmationModalController($scope, $uibModalInstance, data) {
+            this.$scope = $scope;
+            this.$uibModalInstance = $uibModalInstance;
+            this.data = data;
+            this.data = data;
         }
-        function cancel() {
-            $uibModalInstance.dismiss('delete');
-        }
-        function accept() {
-            $uibModalInstance.close();
-        }
-    }
+        ConfirmationModalController.prototype.cancel = function () {
+            this.$uibModalInstance.dismiss('delete');
+        };
+        ConfirmationModalController.prototype.accept = function () {
+            this.$uibModalInstance.close();
+        };
+        ConfirmationModalController.$inject = ['$scope', '$uibModalInstance', 'data'];
+        return ConfirmationModalController;
+    }());
+    angular.module('app').controller('confirmationModalController', ConfirmationModalController);
 })();
 
 },{}],4:[function(require,module,exports){
 (function () {
     'use strict';
-    angular.module('app').controller('loginController', loginController);
-    loginController.$inject = ['$scope', '$state', 'storeService', 'ajaxService'];
-    function loginController($scope, $state, storeService, ajaxService) {
-        var vm = this;
-        vm.status = null;
-        vm.username = null;
-        vm.password = null;
-        vm.login = login;
-        _activate();
-        function _activate() {
+    var LoginController = (function () {
+        function LoginController($scope, $state, storeService, ajaxService) {
+            this.$scope = $scope;
+            this.$state = $state;
+            this.storeService = storeService;
+            this.ajaxService = ajaxService;
         }
-        function login() {
-            vm.status = null;
-            ajaxService.login(vm.username, vm.password).then(function (response) {
+        LoginController.prototype.login = function () {
+            var _this = this;
+            this.status = null;
+            this.ajaxService.login(this.username, this.password).then(function (response) {
                 if (response.data.status === 'ERROR') {
-                    vm.status = response.data.payload;
+                    _this.status = response.data.payload;
                 }
                 else {
-                    $state.go('/');
+                    _this.$state.go('/');
                 }
             });
-        }
-    }
+        };
+        LoginController.$inject = ['$scope', '$state', 'storeService', 'ajaxService'];
+        return LoginController;
+    }());
+    angular.module('app').controller('loginController', LoginController);
 })();
 
 },{}],5:[function(require,module,exports){
@@ -169,6 +180,7 @@
     'use strict';
     var MainController = (function () {
         function MainController($scope, $q, $rootScope, $state, $uibModal, storeService) {
+            var _this = this;
             this.$scope = $scope;
             this.$q = $q;
             this.$rootScope = $rootScope;
@@ -180,15 +192,12 @@
             this.reservations = {};
             this.reservationCount = 0;
             this.loading = false;
-            this.init();
-        }
-        MainController.prototype.init = function () {
-            var _this = this;
             this.getReservationList();
             this.storeService.getCurrentUser().then(function (user) {
                 _this.currentUser = user;
             });
-        };
+            this.$scope.$on('deleteReservation', this.deleteReservation.bind(this));
+        }
         MainController.prototype.toastSuccess = function () {
             var defer = this.$q.defer();
             this.$rootScope.$broadcast('OK', '');
@@ -205,7 +214,7 @@
                 _this.loading = false;
             });
         };
-        MainController.prototype.deleteReservation = function (reservationId) {
+        MainController.prototype.deleteReservation = function (e, reservationId) {
             var _this = this;
             var date = this.reservations[reservationId].date;
             var title = 'About to delete a reservation';
@@ -228,7 +237,7 @@
                 }
             });
             modalInstance.result.then(function () {
-                _this.storeService.deleteReservation(reservationId).then(_this.toastSuccess).then(function () {
+                _this.storeService.deleteReservation(reservationId).then(_this.toastSuccess.bind(_this)).then(function () {
                     _this.$scope.$broadcast('updateCalendar');
                 });
             });
@@ -587,7 +596,6 @@
                 date: '=',
                 count: '=',
                 user: '=',
-                delete: '=',
                 newReservation: '='
             }
         };
@@ -595,6 +603,7 @@
             $scope.days = [];
             $scope.checkVaidity = checkVaidity;
             $scope.getNewHref = getNewHref;
+            $scope.delete = deleteReservation;
             $scope.$watch('data', _updateCalendar);
             $scope.$on('updateCalendar', _updateCalendar);
             function _updateCalendar() {
@@ -636,6 +645,9 @@
             }
             function getNewHref(date) {
                 return checkVaidity(date) ? '#/reservation/new/'.concat(date.getTime()) : '';
+            }
+            function deleteReservation(id) {
+                $scope.$emit('deleteReservation', id);
             }
         }
     }
@@ -874,213 +886,198 @@ require('./controllers/spaces.controller');
 },{}],20:[function(require,module,exports){
 (function () {
     'use strict';
-    angular.module('app').factory('ajaxService', ajaxService);
-    ajaxService.$inject = ['$http', '$httpParamSerializerJQLike', 'constants'];
-    function ajaxService($http, $httpParamSerializerJQLike, constants) {
-        var url = constants.serviceUrl;
-        return {
-            ping: ping,
-            checkSession: checkSession,
-            getReservation: getReservation,
-            getReservationList: getReservationList,
-            getReservationTagList: getReservationTagList,
-            getComments: getComments,
-            getTags: getTags,
-            logout: logout,
-            reservationValidity: reservationValidity,
-            getCurrentUser: getCurrentUser,
-            getSpaces: getSpaces,
-            saveReservation: saveReservation,
-            updateReservation: updateReservation,
-            deleteReservation: deleteReservation,
-            addTag: addTag,
-            removeTag: removeTag,
-            saveComment: saveComment,
-            deleteComment: deleteComment,
-            updateComment: updateComment,
-            saveTag: saveTag,
-            login: login
+    var AjaxService = (function () {
+        function AjaxService($http, $httpParamSerializerJQLike, constants) {
+            this.$http = $http;
+            this.$httpParamSerializerJQLike = $httpParamSerializerJQLike;
+            this.constants = constants;
+            this.url = this.constants.serviceUrl.concat('?route=');
+        }
+        AjaxService.prototype.ping = function () {
+            return this.$http.get(this.url.concat('ping'));
         };
-        function ping() {
-            return $http.get(url.concat('?route=ping'));
-        }
-        function checkSession() {
-            return $http.get(url.concat('?route=checkSession'));
-        }
-        function login(username, password) {
-            return $http({
-                url: url.concat('?route=login'),
+        AjaxService.prototype.checkSession = function () {
+            return this.$http.get(this.url.concat('checkSession'));
+        };
+        AjaxService.prototype.login = function (username, password) {
+            return this.$http({
+                url: this.url.concat('login'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     username: username,
                     password: password
                 })
             });
-        }
-        function logout() {
-            return $http.get(url.concat('?route=logout'));
-        }
-        function getCurrentUser() {
-            return $http.get(url.concat('?route=getCurrentUser'));
-        }
-        function reservationValidity(id, day, month, year, from, to, space) {
-            return $http.get(url
-                .concat('?route=reservationValidity&day=').concat(day)
+        };
+        AjaxService.prototype.logout = function () {
+            return this.$http.get(this.url.concat('logout'));
+        };
+        AjaxService.prototype.getCurrentUser = function () {
+            return this.$http.get(this.url.concat('getCurrentUser'));
+        };
+        AjaxService.prototype.reservationValidity = function (id, day, month, year, from, to, space) {
+            return this.$http.get(this.url
+                .concat('reservationValidity&day=').concat(day)
                 .concat('&month=').concat(month)
                 .concat('&year=').concat(year)
                 .concat('&from=').concat(from)
                 .concat('&to=').concat(to)
                 .concat('&space=').concat(space)
                 .concat('&id=').concat(id));
-        }
-        function getReservation(reservationId) {
-            return $http.get(url.concat('?route=getReservation&id=').concat(reservationId));
-        }
-        function getReservationList(month, year) {
-            return $http.get(url.concat('?route=getReservationList&month=').concat(month).concat('&year=').concat(year));
-        }
-        function getReservationTagList(reservationId) {
-            return $http.get(url.concat('?route=getReservationTagList&reservation_id=').concat(reservationId));
-        }
-        function getComments(reservationId) {
-            return $http.get(url.concat('?route=getComments&reservation_id=').concat(reservationId));
-        }
-        function getTags() {
-            return $http.get(url.concat('?route=getTags'));
-        }
-        function getSpaces() {
-            return $http.get(url.concat('?route=getSpaces'));
-        }
-        function saveReservation(obj) {
-            return $http({
-                url: url.concat('?route=saveReservation'),
+        };
+        AjaxService.prototype.getReservation = function (reservationId) {
+            return this.$http.get(this.url.concat('getReservation&id=').concat(reservationId.toString()));
+        };
+        AjaxService.prototype.getReservationList = function (month, year) {
+            return this.$http.get(this.url.concat('getReservationList&month=')
+                .concat(month.toString()).concat('&year=')
+                .concat(year.toString()));
+        };
+        AjaxService.prototype.getReservationTagList = function (reservationId) {
+            return this.$http.get(this.url.concat('getReservationTagList&reservation_id=')
+                .concat(reservationId.toString()));
+        };
+        AjaxService.prototype.getComments = function (reservationId) {
+            return this.$http.get(this.url.concat('getComments&reservation_id=')
+                .concat(reservationId.toString()));
+        };
+        AjaxService.prototype.getTags = function () {
+            return this.$http.get(this.url.concat('getTags'));
+        };
+        AjaxService.prototype.getSpaces = function () {
+            return this.$http.get(this.url.concat('getSpaces'));
+        };
+        AjaxService.prototype.saveReservation = function (obj) {
+            return this.$http({
+                url: this.url.concat('saveReservation'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike(obj)
+                data: this.$httpParamSerializerJQLike(obj)
             });
-        }
-        function updateReservation(obj) {
-            return $http({
-                url: url.concat('?route=updateReservation'),
+        };
+        AjaxService.prototype.updateReservation = function (obj) {
+            return this.$http({
+                url: this.url.concat('updateReservation'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike(obj)
+                data: this.$httpParamSerializerJQLike(obj)
             });
-        }
-        function deleteReservation(reservationId) {
-            return $http({
-                url: url.concat('?route=deleteReservation'),
+        };
+        AjaxService.prototype.deleteReservation = function (reservationId) {
+            return this.$http({
+                url: this.url.concat('deleteReservation'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     reservation_id: reservationId
                 })
             });
-        }
-        function addTag(reservationId, tagId) {
-            return $http({
-                url: url.concat('?route=addTag'),
+        };
+        AjaxService.prototype.addTag = function (reservationId, tagId) {
+            return this.$http({
+                url: this.url.concat('addTag'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     reservation_id: reservationId,
                     tag_id: tagId
                 })
             });
-        }
-        function removeTag(reservationId, tagId) {
-            return $http({
-                url: url.concat('?route=removeTag'),
+        };
+        AjaxService.prototype.removeTag = function (reservationId, tagId) {
+            return this.$http({
+                url: this.url.concat('removeTag'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     reservation_id: reservationId,
                     tag_id: tagId
                 })
             });
-        }
-        function saveComment(comment, reservationId) {
-            return $http({
-                url: url.concat('?route=saveComment'),
+        };
+        AjaxService.prototype.saveComment = function (comment, reservationId) {
+            return this.$http({
+                url: this.url.concat('saveComment'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     comment: comment,
                     reservation_id: reservationId
                 })
             });
-        }
-        function deleteComment(commentId) {
-            return $http({
-                url: url.concat('?route=deleteComment'),
+        };
+        AjaxService.prototype.deleteComment = function (commentId) {
+            return this.$http({
+                url: this.url.concat('deleteComment'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     comment_id: commentId
                 })
             });
-        }
-        function updateComment(comment, commentId) {
-            return $http({
-                url: url.concat('?route=updateComment'),
+        };
+        AjaxService.prototype.updateComment = function (comment, commentId) {
+            return this.$http({
+                url: this.url.concat('updateComment'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     comment_id: commentId,
                     comment: comment
                 })
             });
-        }
-        function saveTag(tag) {
-            return $http({
-                url: url.concat('?route=saveTag'),
+        };
+        AjaxService.prototype.saveTag = function (tag) {
+            return this.$http({
+                url: this.url.concat('saveTag'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     tag: tag
                 })
             });
-        }
-    }
+        };
+        AjaxService.$inject = ['$http', '$httpParamSerializerJQLike', 'constants'];
+        return AjaxService;
+    }());
+    angular.module('app').service('ajaxService', AjaxService);
 })();
 
 },{}],21:[function(require,module,exports){
 (function () {
     'use strict';
-    angular.module('app').factory('interceptor', interceptor);
-    interceptor.$inject = ['$q', '$rootScope'];
-    function interceptor($q, $rootScope) {
-        return {
-            request: request,
-            requestError: requestError,
-            response: response,
-            responseError: responseError
-        };
-        function request(config) {
+    var Interceptor = (function () {
+        function Interceptor($q, $rootScope) {
+            this.$q = $q;
+            this.$rootScope = $rootScope;
+        }
+        Interceptor.prototype.request = function (config) {
             return config;
-        }
-        function requestError(rejection) {
-            return $q.reject(rejection);
-        }
-        function response(response) {
+        };
+        Interceptor.prototype.requestError = function (rejection) {
+            return this.$q.reject(rejection);
+        };
+        Interceptor.prototype.response = function (response) {
             if (response.data.status === 'ERROR') {
-                $rootScope.$broadcast('ERROR', response.data.payload);
-                return $q.reject(response);
+                this.$rootScope.$broadcast('ERROR', response.data.payload);
+                return this.$q.reject(response);
             }
             return response;
-        }
-        function responseError(rejection) {
+        };
+        Interceptor.prototype.responseError = function (rejection) {
             if (rejection.status === 403) {
-                $rootScope.$broadcast('goToLogin');
+                this.$rootScope.$broadcast('goToLogin');
             }
             if (rejection.status === 400) {
-                $rootScope.$broadcast('goToRoot');
+                this.$rootScope.$broadcast('goToRoot');
             }
-            var message = rejection.data.payload ? rejection.data.payload : '';
-            return $q.reject(rejection);
-        }
-    }
+            return this.$q.reject(rejection);
+        };
+        Interceptor.$inject = ['$q', '$rootScope'];
+        return Interceptor;
+    }());
+    angular.module('app').service('interceptor', Interceptor);
 })();
 
 },{}],22:[function(require,module,exports){
@@ -1090,7 +1087,7 @@ require('./controllers/spaces.controller');
         function ProcessService() {
         }
         ProcessService.prototype.addZeros = function (number) {
-            return (number < 10 ? '0'.concat(number.toString()) : number.toString);
+            return (number < 10 ? '0'.concat(number.toString()) : number.toString());
         };
         ProcessService.prototype.dbArrayAdapter = function (dbArray) {
             var dbObject = {};

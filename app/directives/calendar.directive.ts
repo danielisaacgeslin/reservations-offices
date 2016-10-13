@@ -1,59 +1,51 @@
-(function(){
+(()=>{
 	'use strict';
+
 	angular.module('app').directive('calendar', calendarDirective);
 
   calendarDirective.$inject = [];
 
-	function calendarDirective() {
-    return {
-      restrict: 'E',
-      templateUrl: 'calendar.directive.html',
-      link: link,
-      scope: {
-          data: '=',
-					date: '=',
-					count: '=',
-					user: '=',
-					delete: '=',
-					newReservation: '='
-      }
-    };
+	function calendarDirective(): ng.IDirective {
 
-    function link($scope){
-			$scope.days = [];
+		class Link{
+			constructor(public $scope: any){
+				this.$scope.days = [];
 
-			$scope.checkVaidity = checkVaidity;
-			$scope.getNewHref = getNewHref;
+				this.$scope.checkVaidity = this.checkVaidity;
+				this.$scope.getNewHref = this.getNewHref;
+				this.$scope.delete = this.deleteReservation;
 
-			$scope.$watch('data', _updateCalendar);
-			$scope.$on('updateCalendar',_updateCalendar);
+				this.$scope.$watch('data', this.updateCalendar.bind(this));
+				this.$scope.$on('updateCalendar', this.updateCalendar.bind(this));
+			}
 
       /*private functions*/
-			function _updateCalendar(){
-				var month = $scope.date.getMonth();
-				var year = $scope.date.getFullYear();
-				var days = _getDaysInMonth(month, year);
-				var count = 0;
+			private updateCalendar(){
+				const month: number = this.$scope.date.getMonth();
+				const year: number = this.$scope.date.getFullYear();
+				let days: any[] = this.getDaysInMonth(month, year);
+				let count: number = 0;
 
-				days = days.map(function(day){
+				days = days.map((day: any): any=>{
 					day.items = [];
 					day.empty = true;
-					for(var item in $scope.data){
-						if(_compareDates(day.date, $scope.data[item].date)){
-							day.items.push($scope.data[item]);
+					for(let item in this.$scope.data){
+						if(this.compareDates(day.date, this.$scope.data[item].date)){
+							day.items.push(this.$scope.data[item]);
 							day.empty = false;
 							count++;
 						}
 					}
 					return day;
 				});
-				$scope.count = count;
-				$scope.days = days;
+
+				this.$scope.count = count;
+				this.$scope.days = days;
 			}
 
-			function _getDaysInMonth(month, year) {
-				var date = new Date(year, month, 1);
-				var days = [];
+			private getDaysInMonth(month: number, year: number): any[] {
+				const date: Date = new Date(year, month, 1);
+				let days: any[] = [];
 				while (date.getMonth() === month) {
 					days.push({date: new Date(date)});
 					date.setDate(date.getDate() + 1);
@@ -61,22 +53,38 @@
 				return days;
 			}
 
-			function _compareDates(date1, date2){
+			private compareDates(date1: Date, date2: Date){
 				return date1.getTime() === date2.getTime();
 			}
       /*end private functions*/
 
       /*public functions*/
-			function checkVaidity(date){
-				var time = date.getTime();
-				var yesterday = new Date().setDate(new Date().getDate() - 1);
+			public checkVaidity(date: Date): boolean{
+				const time: number = date.getTime();
+				const yesterday: number = new Date().setDate(new Date().getDate() - 1);
 				return time > yesterday;
 			}
 
-			function getNewHref(date){
-				return checkVaidity(date) ? '#/reservation/new/'.concat(date.getTime()) : '';
+			public getNewHref(date: Date): string{
+				return this.checkVaidity(date) ? '#/reservation/new/'.concat(date.getTime().toString()) : '';
 			}
-      /*end public functions*/
+
+			public deleteReservation(id: number): void{
+				this.$scope.$emit('deleteReservation', id);
+			}
     }
+
+    return {
+      restrict: 'E',
+      templateUrl: 'calendar.directive.html',
+      link: Link,
+      scope: {
+          data: '=',
+					date: '=',
+					count: '=',
+					user: '=',
+					newReservation: '='
+      }
+    };
 	}
 })();

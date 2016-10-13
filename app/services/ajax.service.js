@@ -1,172 +1,159 @@
 (function () {
     'use strict';
-    angular.module('app').factory('ajaxService', ajaxService);
-    ajaxService.$inject = ['$http', '$httpParamSerializerJQLike', 'constants'];
-    function ajaxService($http, $httpParamSerializerJQLike, constants) {
-        var url = constants.serviceUrl;
-        return {
-            ping: ping,
-            checkSession: checkSession,
-            getReservation: getReservation,
-            getReservationList: getReservationList,
-            getReservationTagList: getReservationTagList,
-            getComments: getComments,
-            getTags: getTags,
-            logout: logout,
-            reservationValidity: reservationValidity,
-            getCurrentUser: getCurrentUser,
-            getSpaces: getSpaces,
-            saveReservation: saveReservation,
-            updateReservation: updateReservation,
-            deleteReservation: deleteReservation,
-            addTag: addTag,
-            removeTag: removeTag,
-            saveComment: saveComment,
-            deleteComment: deleteComment,
-            updateComment: updateComment,
-            saveTag: saveTag,
-            login: login
+    var AjaxService = (function () {
+        function AjaxService($http, $httpParamSerializerJQLike, constants) {
+            this.$http = $http;
+            this.$httpParamSerializerJQLike = $httpParamSerializerJQLike;
+            this.constants = constants;
+            this.url = this.constants.serviceUrl.concat('?route=');
+        }
+        AjaxService.prototype.ping = function () {
+            return this.$http.get(this.url.concat('ping'));
         };
-        function ping() {
-            return $http.get(url.concat('?route=ping'));
-        }
-        function checkSession() {
-            return $http.get(url.concat('?route=checkSession'));
-        }
-        function login(username, password) {
-            return $http({
-                url: url.concat('?route=login'),
+        AjaxService.prototype.checkSession = function () {
+            return this.$http.get(this.url.concat('checkSession'));
+        };
+        AjaxService.prototype.login = function (username, password) {
+            return this.$http({
+                url: this.url.concat('login'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     username: username,
                     password: password
                 })
             });
-        }
-        function logout() {
-            return $http.get(url.concat('?route=logout'));
-        }
-        function getCurrentUser() {
-            return $http.get(url.concat('?route=getCurrentUser'));
-        }
-        function reservationValidity(id, day, month, year, from, to, space) {
-            return $http.get(url
-                .concat('?route=reservationValidity&day=').concat(day)
+        };
+        AjaxService.prototype.logout = function () {
+            return this.$http.get(this.url.concat('logout'));
+        };
+        AjaxService.prototype.getCurrentUser = function () {
+            return this.$http.get(this.url.concat('getCurrentUser'));
+        };
+        AjaxService.prototype.reservationValidity = function (id, day, month, year, from, to, space) {
+            return this.$http.get(this.url
+                .concat('reservationValidity&day=').concat(day)
                 .concat('&month=').concat(month)
                 .concat('&year=').concat(year)
                 .concat('&from=').concat(from)
                 .concat('&to=').concat(to)
                 .concat('&space=').concat(space)
                 .concat('&id=').concat(id));
-        }
-        function getReservation(reservationId) {
-            return $http.get(url.concat('?route=getReservation&id=').concat(reservationId));
-        }
-        function getReservationList(month, year) {
-            return $http.get(url.concat('?route=getReservationList&month=').concat(month).concat('&year=').concat(year));
-        }
-        function getReservationTagList(reservationId) {
-            return $http.get(url.concat('?route=getReservationTagList&reservation_id=').concat(reservationId));
-        }
-        function getComments(reservationId) {
-            return $http.get(url.concat('?route=getComments&reservation_id=').concat(reservationId));
-        }
-        function getTags() {
-            return $http.get(url.concat('?route=getTags'));
-        }
-        function getSpaces() {
-            return $http.get(url.concat('?route=getSpaces'));
-        }
-        function saveReservation(obj) {
-            return $http({
-                url: url.concat('?route=saveReservation'),
+        };
+        AjaxService.prototype.getReservation = function (reservationId) {
+            return this.$http.get(this.url.concat('getReservation&id=').concat(reservationId.toString()));
+        };
+        AjaxService.prototype.getReservationList = function (month, year) {
+            return this.$http.get(this.url.concat('getReservationList&month=')
+                .concat(month.toString()).concat('&year=')
+                .concat(year.toString()));
+        };
+        AjaxService.prototype.getReservationTagList = function (reservationId) {
+            return this.$http.get(this.url.concat('getReservationTagList&reservation_id=')
+                .concat(reservationId.toString()));
+        };
+        AjaxService.prototype.getComments = function (reservationId) {
+            return this.$http.get(this.url.concat('getComments&reservation_id=')
+                .concat(reservationId.toString()));
+        };
+        AjaxService.prototype.getTags = function () {
+            return this.$http.get(this.url.concat('getTags'));
+        };
+        AjaxService.prototype.getSpaces = function () {
+            return this.$http.get(this.url.concat('getSpaces'));
+        };
+        AjaxService.prototype.saveReservation = function (obj) {
+            return this.$http({
+                url: this.url.concat('saveReservation'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike(obj)
+                data: this.$httpParamSerializerJQLike(obj)
             });
-        }
-        function updateReservation(obj) {
-            return $http({
-                url: url.concat('?route=updateReservation'),
+        };
+        AjaxService.prototype.updateReservation = function (obj) {
+            return this.$http({
+                url: this.url.concat('updateReservation'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike(obj)
+                data: this.$httpParamSerializerJQLike(obj)
             });
-        }
-        function deleteReservation(reservationId) {
-            return $http({
-                url: url.concat('?route=deleteReservation'),
+        };
+        AjaxService.prototype.deleteReservation = function (reservationId) {
+            return this.$http({
+                url: this.url.concat('deleteReservation'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     reservation_id: reservationId
                 })
             });
-        }
-        function addTag(reservationId, tagId) {
-            return $http({
-                url: url.concat('?route=addTag'),
+        };
+        AjaxService.prototype.addTag = function (reservationId, tagId) {
+            return this.$http({
+                url: this.url.concat('addTag'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     reservation_id: reservationId,
                     tag_id: tagId
                 })
             });
-        }
-        function removeTag(reservationId, tagId) {
-            return $http({
-                url: url.concat('?route=removeTag'),
+        };
+        AjaxService.prototype.removeTag = function (reservationId, tagId) {
+            return this.$http({
+                url: this.url.concat('removeTag'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     reservation_id: reservationId,
                     tag_id: tagId
                 })
             });
-        }
-        function saveComment(comment, reservationId) {
-            return $http({
-                url: url.concat('?route=saveComment'),
+        };
+        AjaxService.prototype.saveComment = function (comment, reservationId) {
+            return this.$http({
+                url: this.url.concat('saveComment'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     comment: comment,
                     reservation_id: reservationId
                 })
             });
-        }
-        function deleteComment(commentId) {
-            return $http({
-                url: url.concat('?route=deleteComment'),
+        };
+        AjaxService.prototype.deleteComment = function (commentId) {
+            return this.$http({
+                url: this.url.concat('deleteComment'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     comment_id: commentId
                 })
             });
-        }
-        function updateComment(comment, commentId) {
-            return $http({
-                url: url.concat('?route=updateComment'),
+        };
+        AjaxService.prototype.updateComment = function (comment, commentId) {
+            return this.$http({
+                url: this.url.concat('updateComment'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     comment_id: commentId,
                     comment: comment
                 })
             });
-        }
-        function saveTag(tag) {
-            return $http({
-                url: url.concat('?route=saveTag'),
+        };
+        AjaxService.prototype.saveTag = function (tag) {
+            return this.$http({
+                url: this.url.concat('saveTag'),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                data: $httpParamSerializerJQLike({
+                data: this.$httpParamSerializerJQLike({
                     tag: tag
                 })
             });
-        }
-    }
+        };
+        AjaxService.$inject = ['$http', '$httpParamSerializerJQLike', 'constants'];
+        return AjaxService;
+    }());
+    angular.module('app').service('ajaxService', AjaxService);
 })();

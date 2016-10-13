@@ -1,74 +1,78 @@
-(function(){
-	'use strict';
-	angular.module('app').controller('appController', appController);
+(() => {
+    'use strict';
 
-	appController.$inject = ['$scope', '$state', 'storeService', 'ajaxService', 'constants'];
+    class AppController {
+        static $inject: string[] = ['$scope', '$state', 'storeService', 'ajaxService', 'constants'];
+        private route: string;
+        public currentUser: IUser = {};
+        public toasterData: IToasterData = {};
 
-	function appController($scope, $state, storeService, ajaxService, constants) {
-		var vm = this;
-    vm.route = null;
-		vm.currentUser = {};
-		vm.toasterData = {};
+        constructor(
+            public $scope: ng.IScope,
+            private $state: ng.ui.IStateService,
+            private storeService: any,
+            private ajaxService: any,
+            private constants: any) {
+            this.init();
+        }
 
-		vm.logout = logout;
 
-    _activate();
 
-    $scope.$watch(function(){return $state.current;}, _updateRoute);
-		$scope.$on('ERROR', _toastError);
-		$scope.$on('OK', _toastSuccess);
-		$scope.$on('goToLogin', _goToLogin);
-		$scope.$on('goToRoot', _goToRoot);
+        /*private functions*/
+        private init(): void {
+            this.$scope.$watch(() => this.$state.current, this.updateRoute.bind(this));
+            this.$scope.$on('ERROR', this.toastError.bind(this));
+            this.$scope.$on('OK', this.toastSuccess.bind(this));
+            this.$scope.$on('goToLogin', this.goToLogin.bind(this));
+            this.$scope.$on('goToRoot', this.goToRoot.bind(this));
+            this.updateRoute();
+        }
 
-		/*private functions*/
-		function _activate(){
-			_updateRoute();
-		}
+        private goToLogin(): void {
+            this.$state.go('/login');
+        }
 
-		function _goToLogin(){
-			$state.go('/login');
-		}
+        private goToRoot(): void {
+            this.$state.go('/');
+        }
 
-		function _goToRoot(){
-			$state.go('/');
-		}
+        private toastError(e: any, data: any): void {
+            const type = e.name;
+            const message = data ? data : this.constants.genericErrorMessage;
+            this.toasterData = { type: type, message: message };
+        }
 
-		function _toastError(e,data){
-			var type = e.name;
-			var message = data ? data : constants.genericErrorMessage;
-			vm.toasterData = {type: type, message: message};
-		}
+        private toastSuccess(e: any, data: any): void {
+            const type = e.name;
+            const message = data ? data : this.constants.genericSuccessMessage;
+            this.toasterData = { type: type, message: message };
+        }
 
-		function _toastSuccess(e,data){
-			var type = e.name;
-			var message = data ? data : constants.genericSuccessMessage;
-			vm.toasterData = {type: type, message: message};
-		}
+        private updateRoute(): boolean {
+            if (!this.$state.current.name || this.$state.current.name === '/login') {
+                this.storeService.resetCurrentUser();
+                this.currentUser = {};
+                return false;
+            }
+            this.getCurrentUser().then(() => {
+                this.route = this.$state.current.name;
+                return true;
+            });
+            return true;
+        }
 
-    function _updateRoute(){
-			if(!$state.current.name || $state.current.name === '/login'){
-				storeService.resetCurrentUser();
-				vm.currentUser = {};
-				return false;
-			}
-			_getCurrentUser().then(function(){
-				vm.route = $state.current.name;
-			});
+        private getCurrentUser(): ng.IPromise<IUser> {
+            return this.storeService.getCurrentUser().then((currentUser: IUser) => {
+                this.currentUser = currentUser;
+            });
+        }
+
+        public logout(): void {
+            this.storeService.logout().then(() => {
+                this.$state.go('/login');
+            });
+        }
     }
 
-		function _getCurrentUser(){
-			return storeService.getCurrentUser().then(function(currentUser){
-				vm.currentUser = currentUser;
-			});
-		}
-		/*end private functions*/
-
-		/*public functions*/
-		function logout(){
-			storeService.logout().then(function(){
-				$state.go('/login');
-			});
-		}
-		/*end public functions*/
-	}
+    angular.module('app').controller('appController', AppController);
 })();

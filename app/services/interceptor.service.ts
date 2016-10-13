@@ -1,43 +1,39 @@
-(function(){
-	'use strict';
-	angular.module('app').factory('interceptor', interceptor);
+(() => {
+    'use strict';
 
-	interceptor.$inject = ['$q','$rootScope'];
+    class Interceptor {
+        static $inject: string[] = ['$q', '$rootScope'];
 
-	function interceptor($q, $rootScope) {
-		return {
-      request: request,
-      requestError: requestError,
-      response: response,
-      responseError: responseError
-    };
+        constructor(private $q: ng.IQService, private $rootScope: ng.IRootScopeService) {
 
-    function request(config){
-      return config;
+        }
+
+        public request(config: any): any {
+            return config;
+        }
+
+        public requestError(rejection: any): any {
+            return this.$q.reject(rejection);
+        }
+
+        public response(response: any): any {
+            if (response.data.status === 'ERROR') {
+                this.$rootScope.$broadcast('ERROR', response.data.payload);
+                return this.$q.reject(response);
+            }
+            return response;
+        }
+
+        public responseError(rejection: any): any {
+            if (rejection.status === 403) {
+                this.$rootScope.$broadcast('goToLogin');
+            }
+            if (rejection.status === 400) {
+                this.$rootScope.$broadcast('goToRoot');
+            }
+            return this.$q.reject(rejection);
+        }
     }
 
-    function requestError(rejection){
-      return $q.reject(rejection);
-    }
-
-    function response(response){
-      if(response.data.status === 'ERROR'){
-        $rootScope.$broadcast('ERROR', response.data.payload);
-        return $q.reject(response);
-      }
-      return response;
-    }
-
-    function responseError(rejection){
-			if(rejection.status === 403){
-				$rootScope.$broadcast('goToLogin');
-			}
-			if(rejection.status === 400){
-				$rootScope.$broadcast('goToRoot');
-			}
-			var message = rejection.data.payload ? rejection.data.payload : '';
-      return $q.reject(rejection);
-    }
-
-	}
+    angular.module('app').service('interceptor', Interceptor);
 })();
