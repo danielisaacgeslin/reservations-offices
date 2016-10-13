@@ -1,10 +1,10 @@
-(function(){
+(()=>{
 	'use strict';
 	angular.module('app').filter('department', departmentFilter);
 
-	function departmentFilter() {
-		return function(input){
-      var output;
+	function departmentFilter(): Function {
+		return function(input: string): string{
+      let output;
 			input = String(input);
       switch(input){
         case '1':
@@ -32,7 +32,7 @@
           output = 'invalid time';
           break;
       }
-      return output;
+      return <string>output;
     };
 	}
 })();

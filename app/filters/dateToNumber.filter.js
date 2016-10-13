@@ -3,7 +3,7 @@
     angular.module('app').filter('dateToNumber', dateToNumberFilter);
     function dateToNumberFilter() {
         return function (input) {
-            var output = null;
+            var output;
             output = input.getTime();
             return output;
         };

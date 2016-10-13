@@ -1,10 +1,10 @@
-(function(){
+(()=>{
 	'use strict';
 	angular.module('app').filter('time', timeFilter);
 
-	function timeFilter() {
-		return function(input){
-      var output;
+	function timeFilter(): Function {
+		return function(input: string): string{
+      let output;
 			input = String(input);
       switch(input){
         case '1':
@@ -20,7 +20,7 @@
           output = '';
           break;
       }
-      return output;
+      return <string>output;
     };
 	}
 })();
