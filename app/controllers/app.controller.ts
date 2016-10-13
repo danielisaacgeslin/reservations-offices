@@ -1,11 +1,12 @@
 (() => {
     'use strict';
 
-    class AppController {
+    class AppController implements ng.IController{
         static $inject: string[] = ['$scope', '$state', 'storeService', 'ajaxService', 'constants'];
         private route: string;
         public currentUser: IUser = {};
         public toasterData: IToasterData = {};
+        public now: number = Date.now();
 
         constructor(
             public $scope: ng.IScope,

@@ -53,12 +53,14 @@ switch ($route) {
         break;
     case 'saveReservation':
         $reservation = new Reservation();
-        $result = $reservation->setReservation($_POST['title'], $_POST['date'], $_POST['from'], $_POST['to'], $_POST['space']);
+        $description = isset($_POST['description']) ? $_POST['description'] : '';
+        $result = $reservation->setReservation($_POST['title'], $_POST['date'], $_POST['from'], $_POST['to'], $_POST['space'], $description);
         ($result ? response(OK, $result) : response(ERROR, ""));
         break;
     case 'updateReservation':
         $reservation = new Reservation();
-        $result = $reservation->updateReservation($_POST['reservation_id'], $_POST['title'], $_POST['date'], $_POST['from'], $_POST['to'], $_POST['space']);
+        $description = isset($_POST['description']) ? $_POST['description'] : '';
+        $result = $reservation->updateReservation($_POST['reservation_id'], $_POST['title'], $_POST['date'], $_POST['from'], $_POST['to'], $_POST['space'], $description);
         ($result ? response(OK, $result) : response(ERROR, ""));
         break;
     case 'deleteReservation':

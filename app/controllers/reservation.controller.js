@@ -1,27 +1,32 @@
 (function () {
     'use strict';
-    angular.module('app').controller('reservationController', reservationController);
-    reservationController.$inject = ['$scope', '$rootScope', '$state', '$q', '$uibModal', 'storeService', 'ajaxService', 'processService'];
-    function reservationController($scope, $rootScope, $state, $q, $uibModal, storeService, ajaxService, processService) {
-        var vm = this;
-        _activate();
-        function _activate() {
-            vm.reservation = {};
-            vm.newComment = '';
-            vm.editableComment = -1;
-            vm.editableCommentText = '';
-            vm.filteredTags = {};
-            vm.noTagOption = { 0: { id: 0, text: 'No tags available' } };
-            vm.selectedTag = null;
-            vm.tempId = null;
-            vm.editEnabled = true;
-            vm.times = _getTimes();
-            vm.reservationValidity = true;
-            vm.currentUser = {};
-            vm.tags = {};
-            vm.spaces = {};
-            vm.lastCheck = {};
-            vm.edition = {
+    var ReservationController = (function () {
+        function ReservationController($scope, $rootScope, $state, $q, $uibModal, storeService, ajaxService, processService) {
+            this.$scope = $scope;
+            this.$rootScope = $rootScope;
+            this.$state = $state;
+            this.$q = $q;
+            this.$uibModal = $uibModal;
+            this.storeService = storeService;
+            this.ajaxService = ajaxService;
+            this.processService = processService;
+            this.$inject = ['this.$scope', '$rootScope', '$state', '$q', '$uibModal', 'storeService', 'ajaxService', 'processService'];
+            this.reservation = {};
+            this.newComment = '';
+            this.editableComment = -1;
+            this.editableCommentText = '';
+            this.filteredTags = {};
+            this.noTagOption = { 0: { id: 0, text: 'No tags available' } };
+            this.times = this.getTimes();
+            this.currentUser = {};
+            this.tags = {};
+            this.spaces = {};
+            this.lastCheck = {};
+            this.editEnabled = true;
+            this.reservationValidity = true;
+            this.ableToCheckVailidity = false;
+            this.loading = false;
+            this.edition = {
                 title: null,
                 description: null,
                 body: null,
@@ -30,63 +35,61 @@
                 space: 1,
                 date: new Date()
             };
-            vm.toggleEdit = toggleEdit;
-            vm.saveReservation = saveReservation;
-            vm.saveComment = saveComment;
-            vm.editComment = editComment;
-            vm.updateComment = updateComment;
-            vm.deleteComment = deleteComment;
-            vm.setTag = setTag;
-            vm.deleteTag = deleteTag;
-            vm.ableToCheckVailidity = false;
-            vm.loading = false;
-            $scope.$watch('vm.edition.date', _checkValidity);
-            $scope.$watch('vm.edition.from_time', _checkValidity);
-            $scope.$watch('vm.edition.to_time', _checkValidity);
-            $scope.$watch('vm.edition.space', _checkValidity);
-            if (isNaN($state.params.id)) {
-                vm.ableToCheckVailidity = true;
-                if ($state.params.date && !isNaN($state.params.date)) {
-                    vm.edition.date = new Date(Number($state.params.date));
+            this.init();
+        }
+        ReservationController.prototype.init = function () {
+            var _this = this;
+            this.$scope.$watchGroup([
+                function () { return _this.edition.date; },
+                function () { return _this.edition.from_time; },
+                function () { return _this.edition.to_time; },
+                function () { return _this.edition.space; }
+            ], this.checkValidity.bind(this));
+            if (isNaN(this.$state.params.id)) {
+                this.ableToCheckVailidity = true;
+                if (this.$state.params.date && !isNaN(this.$state.params.date)) {
+                    this.edition.date = new Date(Number(this.$state.params.date));
                 }
-                $q.all([_getCurrentUser(), _getTags(), _getSpaces()]).then(_filterTags);
+                this.$q.all([this.getCurrentUser(), this.getTags(), this.getSpaces()]).then(this.filterTags.bind(this));
             }
             else {
-                _getCurrentUser().then(_getReservation).then(function () {
-                    vm.ableToCheckVailidity = true;
-                    _getComments();
-                    _checkValidity();
-                    $q.all([_getReservationTagList(), _getTags(), _getSpaces()]).then(_filterTags);
+                this.getCurrentUser().then(this.getReservation.bind(this)).then(function () {
+                    _this.ableToCheckVailidity = true;
+                    _this.getComments();
+                    _this.checkValidity();
+                    _this.$q.all([_this.getReservationTagList(), _this.getTags(), _this.getSpaces()]).then(_this.filterTags.bind(_this));
                 });
             }
-        }
-        function _getTimes() {
+        };
+        ReservationController.prototype.getTimes = function () {
             var times = [];
             for (var i = 1; i <= 24; i++) {
                 times.push(i);
             }
             return times;
-        }
-        function _toastSuccess() {
-            var defer = $q.defer();
-            $rootScope.$broadcast('OK', '');
+        };
+        ReservationController.prototype.toastSuccess = function () {
+            var defer = this.$q.defer();
+            this.$rootScope.$broadcast('OK', '');
             defer.resolve();
-            vm.loading = false;
+            this.loading = false;
             return defer.promise;
-        }
-        function _getCurrentUser() {
-            return storeService.getCurrentUser().then(function (user) {
-                vm.currentUser = user;
+        };
+        ReservationController.prototype.getCurrentUser = function () {
+            var _this = this;
+            return this.storeService.getCurrentUser().then(function (user) {
+                _this.currentUser = user;
             });
-        }
-        function _checkValidity() {
-            var id = vm.reservation.id;
-            var day = processService.addZeros(vm.edition.date.getDate());
-            var month = processService.addZeros(vm.edition.date.getMonth() + 1);
-            var year = vm.edition.date.getFullYear();
-            var from = vm.edition.from_time;
-            var to = vm.edition.to_time;
-            var space = vm.edition.space;
+        };
+        ReservationController.prototype.checkValidity = function () {
+            var _this = this;
+            var id = this.reservation.id;
+            var day = this.processService.addZeros(this.edition.date.getDate());
+            var month = this.processService.addZeros(this.edition.date.getMonth() + 1);
+            var year = this.edition.date.getFullYear();
+            var from = this.edition.from_time;
+            var to = this.edition.to_time;
+            var space = this.edition.space;
             var check = {
                 id: id,
                 day: day,
@@ -97,110 +100,118 @@
                 space: space
             };
             var valid = Boolean(!!day && !!month && !!year && !!from && !!to && !!space);
-            if (!vm.ableToCheckVailidity || !valid || angular.equals(check, vm.lastCheck)) {
-                vm.reservationValidity = false;
+            if (!this.ableToCheckVailidity || !valid || angular.equals(check, this.lastCheck)) {
+                this.reservationValidity = false;
                 return false;
             }
-            vm.lastCheck = check;
-            ajaxService.reservationValidity(id, day, month, year, from, to, space).then(function (response) {
-                vm.reservationValidity = response.data.payload;
+            this.lastCheck = check;
+            this.ajaxService.reservationValidity(id, day, month, year, from, to, space).then(function (response) {
+                _this.reservationValidity = response.data.payload;
             });
-        }
-        function _getReservation() {
-            var defer = $q.defer();
-            storeService.getReservation(vm.tempId ? vm.tempId : $state.params.id).then(function (reservation) {
-                vm.reservation = reservation;
-                vm.edition = Object.assign({}, reservation);
-                vm.editEnabled = (vm.currentUser.id === reservation.creation_user) && reservation.date.getTime() > Date.now();
+        };
+        ReservationController.prototype.getReservation = function () {
+            var _this = this;
+            var defer = this.$q.defer();
+            this.storeService.getReservation(this.tempId ? this.tempId : this.$state.params.id).then(function (reservation) {
+                _this.reservation = reservation;
+                _this.edition = Object.assign({}, reservation);
+                _this.editEnabled = (_this.currentUser.id === reservation.creation_user) && reservation.date.getTime() > Date.now();
                 defer.resolve();
             }).catch(function () {
-                $state.go('/reservation', { id: 'new', date: Date.now() });
-                storeService.resetReservations();
+                _this.$state.go('/reservation', { id: 'new', date: Date.now() });
+                _this.storeService.resetReservations();
                 defer.reject();
             });
             return defer.promise;
-        }
-        function _getComments() {
-            return storeService.getComments(vm.reservation.id);
-        }
-        function _getReservationTagList() {
-            return storeService.getReservationTagList(vm.reservation.id);
-        }
-        function _getTags() {
-            return storeService.getTags().then(function (tags) {
-                vm.tags = tags;
+        };
+        ReservationController.prototype.getComments = function () {
+            return this.storeService.getComments(this.reservation.id);
+        };
+        ReservationController.prototype.getReservationTagList = function () {
+            return this.storeService.getReservationTagList(this.reservation.id);
+        };
+        ReservationController.prototype.getTags = function () {
+            var _this = this;
+            return this.storeService.getTags().then(function (tags) {
+                _this.tags = tags;
             });
-        }
-        function _getSpaces() {
-            return storeService.getSpaces().then(function (spaces) {
-                vm.spaces = spaces;
+        };
+        ReservationController.prototype.getSpaces = function () {
+            var _this = this;
+            return this.storeService.getSpaces().then(function (spaces) {
+                _this.spaces = spaces;
             });
-        }
-        function _filterTags() {
-            var filteredTags = {}, marker;
-            if (!vm.reservation.id) {
-                vm.filteredTags = vm.noTagOption;
-                vm.selectedTag = vm.filteredTags[Object.keys(vm.filteredTags)[0]];
+        };
+        ReservationController.prototype.filterTags = function () {
+            var filteredTags = {};
+            var marker;
+            if (!this.reservation.id) {
+                this.filteredTags = this.noTagOption;
+                this.selectedTag = this.filteredTags[Object.keys(this.filteredTags)[0]];
                 return false;
             }
-            for (var tagKey in vm.tags) {
+            for (var tagKey in this.tags) {
                 marker = true;
-                for (var reservationTagKey in vm.reservation.tags) {
-                    if (reservationTagKey === vm.tags[tagKey].id) {
+                for (var reservationTagKey in this.reservation.tags) {
+                    if (reservationTagKey === this.tags[tagKey].id) {
                         marker = false;
                         break;
                     }
                 }
                 if (marker) {
-                    filteredTags[tagKey] = Object.assign({}, vm.tags[tagKey]);
+                    filteredTags[tagKey] = Object.assign({}, this.tags[tagKey]);
                 }
             }
-            vm.filteredTags = filteredTags;
-            if (!Object.keys(vm.filteredTags).length) {
-                vm.filteredTags = vm.noTagOption;
+            this.filteredTags = filteredTags;
+            if (!Object.keys(this.filteredTags).length) {
+                this.filteredTags = this.noTagOption;
             }
-            vm.selectedTag = vm.filteredTags[Object.keys(vm.filteredTags)[0]];
-        }
-        function _setReservation() {
-            vm.edition.title = vm.edition.title ? vm.edition.title : ' ';
-            vm.loading = true;
+            this.selectedTag = this.filteredTags[Object.keys(this.filteredTags)[0]];
+        };
+        ReservationController.prototype.setReservation = function () {
+            var _this = this;
+            this.edition.title = this.edition.title ? this.edition.title : ' ';
+            this.loading = true;
             var obj = {
-                title: vm.edition.title,
-                description: vm.edition.description,
-                body: vm.edition.body,
-                date: vm.edition.date,
-                from: vm.edition.from_time,
-                to: vm.edition.to_time,
-                space: vm.edition.space,
-                reservation_id: vm.reservation.id
+                title: this.edition.title,
+                description: this.edition.description,
+                body: this.edition.body,
+                date: this.edition.date,
+                from: this.edition.from_time,
+                to: this.edition.to_time,
+                space: this.edition.space,
+                reservation_id: this.reservation.id
             };
-            return storeService.setReservation(obj).then(function (id) {
-                if (!vm.reservation.id) {
-                    vm.tempId = id;
-                    $state.go('/reservation', { id: id }, {
+            return this.storeService.setReservation(obj).then(function (id) {
+                _this.lastCheck = null;
+                if (!_this.reservation.id) {
+                    _this.tempId = id;
+                    _this.$state.go('/reservation', { id: id }, {
                         notify: false,
                         reload: false,
                         location: 'replace',
                         inherit: true
                     });
                 }
-            }).then(_toastSuccess);
-        }
-        function toggleEdit() {
-            vm.editEnabled = !vm.editEnabled;
-            if (!vm.editEnabled) {
-                vm.edition = Object.assign({}, vm.reservation);
+            }).then(this.toastSuccess.bind(this));
+        };
+        ReservationController.prototype.toggleEdit = function () {
+            this.editEnabled = !this.editEnabled;
+            if (!this.editEnabled) {
+                this.edition = Object.assign({}, this.reservation);
             }
-        }
-        function saveReservation() {
-            var date = vm.edition.date;
+        };
+        ReservationController.prototype.saveReservation = function () {
+            var date = this.edition.date;
             var title = 'About to save a reservation';
             var body = 'You are about to save "'
-                .concat(vm.edition.title)
+                .concat(this.edition.title)
                 .concat(' - ')
-                .concat(date.getDate()).concat('/').concat(date.getMonth()).concat('/').concat(date.getFullYear())
+                .concat(date.getDate().toString()).concat('/')
+                .concat(date.getMonth().toString()).concat('/')
+                .concat(date.getFullYear().toString())
                 .concat('". Are you sure?');
-            var modalInstance = $uibModal.open({
+            var modalInstance = this.$uibModal.open({
                 templateUrl: 'confirmation.modal.html',
                 controller: 'confirmationModalController',
                 controllerAs: 'vm',
@@ -212,37 +223,41 @@
                 }
             });
             modalInstance.result
-                .then(_setReservation)
-                .then(_getReservation)
-                .then(_getReservationTagList)
-                .then(_getComments)
-                .then(_filterTags);
-        }
-        function saveComment() {
-            vm.loading = true;
-            return storeService.setComment(vm.newComment, vm.reservation.id).then(function () {
-                vm.newComment = '';
-            }).then(_toastSuccess);
-        }
-        function updateComment(commentId) {
-            vm.loading = true;
-            return storeService.setComment(vm.editableCommentText, null, commentId).then(_toastSuccess).then(editComment);
-        }
-        function editComment(index, commentId) {
-            vm.editableCommentText = '';
-            if (vm.editableComment === index) {
-                vm.editableComment = -1;
+                .then(this.setReservation.bind(this))
+                .then(this.getReservation.bind(this))
+                .then(this.getReservationTagList.bind(this))
+                .then(this.getComments.bind(this))
+                .then(this.filterTags.bind(this));
+        };
+        ReservationController.prototype.saveComment = function () {
+            var _this = this;
+            this.loading = true;
+            return this.storeService.setComment(this.newComment, this.reservation.id).then(function () {
+                _this.newComment = '';
+            }).then(this.toastSuccess.bind(this));
+        };
+        ReservationController.prototype.updateComment = function (commentId) {
+            this.loading = true;
+            return this.storeService.setComment(this.editableCommentText, null, commentId)
+                .then(this.toastSuccess.bind(this))
+                .then(this.editComment.bind(this));
+        };
+        ReservationController.prototype.editComment = function (index, commentId) {
+            this.editableCommentText = '';
+            if (this.editableComment === index) {
+                this.editableComment = -1;
             }
             else {
-                vm.editableComment = index;
-                vm.editableCommentText = !commentId ? '' : vm.reservation.comments[commentId].text;
+                this.editableComment = index;
+                this.editableCommentText = !commentId ? '' : this.reservation.comments[commentId].text;
             }
-        }
-        function deleteComment(commentId) {
-            var date = vm.edition.date;
+        };
+        ReservationController.prototype.deleteComment = function (commentId) {
+            var _this = this;
+            var date = this.edition.date;
             var title = 'About to delete a comment';
             var body = 'Are you sure?';
-            var modalInstance = $uibModal.open({
+            var modalInstance = this.$uibModal.open({
                 templateUrl: 'confirmation.modal.html',
                 controller: 'confirmationModalController',
                 controllerAs: 'vm',
@@ -254,20 +269,25 @@
                 }
             });
             modalInstance.result.then(function () {
-                vm.loading = true;
-                return storeService.deleteComment(commentId, vm.reservation.id).then(_toastSuccess);
+                _this.loading = true;
+                return _this.storeService.deleteComment(commentId, _this.reservation.id)
+                    .then(_this.toastSuccess.bind(_this));
             });
-        }
-        function setTag() {
-            vm.loading = true;
-            storeService.setTag(vm.reservation.id, vm.selectedTag.id)
-                .then(_getReservationTagList)
-                .then(_toastSuccess)
-                .then(_filterTags);
-        }
-        function deleteTag(tagId) {
-            vm.loading = true;
-            return storeService.deleteTag(vm.reservation.id, tagId).then(_toastSuccess).then(_filterTags);
-        }
-    }
+        };
+        ReservationController.prototype.setTag = function () {
+            this.loading = true;
+            return this.storeService.setTag(this.reservation.id, this.selectedTag.id)
+                .then(this.getReservationTagList.bind(this))
+                .then(this.toastSuccess.bind(this))
+                .then(this.filterTags.bind(this));
+        };
+        ReservationController.prototype.deleteTag = function (tagId) {
+            this.loading = true;
+            return this.storeService.deleteTag(this.reservation.id, tagId)
+                .then(this.toastSuccess.bind(this))
+                .then(this.filterTags.bind(this));
+        };
+        return ReservationController;
+    }());
+    angular.module('app').controller('reservationController', ReservationController);
 })();

@@ -4,16 +4,15 @@
 	angular.module('app').directive('toaster', toaster);
 
   toaster.$inject = ['constants'];
-	
+
 	function toaster(constants: any): ng.IDirective {
 
 		class Link{
 			private timeout: number = 0;
 			constructor(public $scope: any, public $element: any, $attr: any){
-				this.$scope.$watch('data', this.toast.bind(this));
+				this.$scope.$watch('data', this.toast);
 			}
 
-			/*private functions*/
 			toast(): boolean{
 				if(!this.$scope.data.type){
 					return false;

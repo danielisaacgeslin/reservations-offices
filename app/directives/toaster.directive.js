@@ -8,7 +8,7 @@
                 this.$scope = $scope;
                 this.$element = $element;
                 this.timeout = 0;
-                this.$scope.$watch('data', this.toast.bind(this));
+                this.$scope.$watch('data', this.toast);
             }
             Link.prototype.toast = function () {
                 var _this = this;

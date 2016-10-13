@@ -8,8 +8,8 @@
         </li>
       </ul>
       <h1 class="title">{{vm.editEnabled ? vm.edition.title : vm.reservation.title}}</h1>
-      <!--<h3 class="description">{{vm.editEnabled ? vm.edition.description : vm.reservation.description}}</h3>-->
-      <p class="body">{{vm.editEnabled ? vm.edition.body : vm.reservation.body}}</p>
+      <h3 class="description">{{vm.editEnabled ? vm.edition.description : vm.reservation.description}}</h3>
+      <!--<p class="body">{{vm.editEnabled ? vm.edition.body : vm.reservation.body}}</p>-->
     </article>
     <div class="comments" ng-if="vm.reservation.id">
       <h4>Comments</h4>

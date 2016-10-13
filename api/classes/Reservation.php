@@ -36,7 +36,7 @@ class Reservation {
         }
     }
 
-    public function setReservation($title, $date, $from, $to, $space) {
+    public function setReservation($title, $date, $from, $to, $space, $description) {
         $creation_user = $_SESSION["ID"];
         if (!isset($title) or ! isset($date) or ! isset($from) or !isset($to) or !isset($space)) {
             return false;
@@ -44,8 +44,8 @@ class Reservation {
 
         $link = Connection::connect();
         $query = 'INSERT INTO RESERVATIONS '
-                . '(TITLE, DATE, FROM_TIME, TO_TIME, SPACE, CREATION_USER) '
-                . 'VALUES (:title, :date, :from_time, :to_time, :space, :creation_user)';
+                . '(TITLE, DATE, FROM_TIME, TO_TIME, SPACE, CREATION_USER, DESCRIPTION) '
+                . 'VALUES (:title, :date, :from_time, :to_time, :space, :creation_user, :description)';
         $stmt = $link->prepare($query);
 
         $stmt->bindParam(':title', $title, PDO::PARAM_STR);
@@ -54,6 +54,7 @@ class Reservation {
         $stmt->bindParam(':to_time', $to, PDO::PARAM_INT);
         $stmt->bindParam(':space', $space, PDO::PARAM_INT);
         $stmt->bindParam(':creation_user', $creation_user, PDO::PARAM_INT);
+        $stmt->bindParam(':description', $description, PDO::PARAM_STR);
 
         if ($stmt->execute()) {
             return $link->lastInsertId();
@@ -62,7 +63,7 @@ class Reservation {
         }
     }
 
-    public function updateReservation($reservation_id, $title, $date, $from, $to, $space) {
+    public function updateReservation($reservation_id, $title, $date, $from, $to, $space, $description) {
       var_dump($space);
         $user = $_SESSION["ID"];
         if (!isset($reservation_id) or ! isset($title) or ! isset($date) or ! isset($from) or !isset($to) or !isset($space)) {
@@ -71,7 +72,7 @@ class Reservation {
 
         $link = Connection::connect();
         $query = 'UPDATE RESERVATIONS SET '
-                . 'TITLE = :title, DATE = :date, FROM_TIME = :from_time, TO_TIME = :to_time, '
+                . 'TITLE = :title, DATE = :date, FROM_TIME = :from_time, TO_TIME = :to_time, DESCRIPTION = :description, '
                 . 'EDITION_USER = :edition_user, EDITION_TIMESTAMP = CURRENT_TIMESTAMP, SPACE = :space '
                 . 'WHERE ID = :reservation_id AND CREATION_USER = :user';
         $stmt = $link->prepare($query);
@@ -84,6 +85,7 @@ class Reservation {
         $stmt->bindParam(':space', $space, PDO::PARAM_INT);
         $stmt->bindParam(':edition_user', $user, PDO::PARAM_INT);
         $stmt->bindParam(':user', $user, PDO::PARAM_INT);
+        $stmt->bindParam(':description', $description, PDO::PARAM_STR);
 
         if ($stmt->execute()) {
             return $stmt->rowCount();

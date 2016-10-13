@@ -1,7 +1,7 @@
 (() => {
     'use strict';
 
-    class ConfirmationModalController {
+    class ConfirmationModalController implements ng.IController{
         static $inject: string[] = ['$scope', '$uibModalInstance', 'data'];
 
         constructor(

@@ -9,7 +9,7 @@
 	  $httpProvider: ng.IHttpProvider){
 
 		$httpProvider.interceptors.push('interceptor');
-		
+
 		$urlRouterProvider.otherwise('/');
 		$stateProvider.state('/', {
 			url : '/',
@@ -54,7 +54,7 @@
 		return ajaxService.checkSession();
 	}
 
-	function constants(){
+	function constants(): any{
 		return {
 			serviceUrl: '/reservations-offices/api/',
 			genericErrorMessage: 'An error has occurred',

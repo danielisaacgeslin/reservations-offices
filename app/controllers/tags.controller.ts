@@ -1,7 +1,7 @@
 (() => {
     'use strict';
 
-    class TagsController {
+    class TagsController implements ng.IController{
         static $inject: string[] = ['$scope', 'storeService'];
         public tags: Object;
 

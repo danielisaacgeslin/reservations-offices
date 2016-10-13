@@ -9,6 +9,7 @@
             this.constants = constants;
             this.currentUser = {};
             this.toasterData = {};
+            this.now = Date.now();
             this.init();
         }
         AppController.prototype.init = function () {

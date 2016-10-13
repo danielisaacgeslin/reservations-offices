@@ -1,7 +1,7 @@
 (() => {
     'use strict';
 
-    class LoginController {
+    class LoginController implements ng.IController{
         static $inject: string[] = ['$scope', '$state', 'storeService', 'ajaxService'];
         public status: string;
         public username: string;

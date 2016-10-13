@@ -1,7 +1,5 @@
 interface IReservation {
-    id: number,
-    creation_timestamp: Date,
-    edition_timestamp: Date,
+    id?: number,
     title: string,
     description: string,
     body: string,
@@ -9,6 +7,8 @@ interface IReservation {
     date: Date,
     from_time: number,
     to_time: number,
-    creation_user: number,
-    edition_user: number
+    creation_timestamp?: Date,
+    edition_timestamp?: Date,
+    creation_user?: number,
+    edition_user?: number
 }

@@ -1,6 +1,6 @@
 (() => {
     'use strict';
-    class MainController {
+    class MainController implements ng.IController{
         static $inject: string[] = ['$scope', '$q', '$rootScope', '$state', '$uibModal', 'storeService'];
         public visualization: string = 'calendar';
         public date: Date = new Date();

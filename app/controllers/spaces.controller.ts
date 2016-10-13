@@ -1,7 +1,7 @@
 (() => {
     'use strict';
 
-    class SpacesController {
+    class SpacesController implements ng.IController{
         static $inject: string[] = ['$scope', 'storeService'];
         public spaces: Object;
 
