@@ -1,17 +1,15 @@
 (function () {
     'use strict';
-    angular.module('app').factory('processService', processService);
-    processService.$inject = [];
-    function processService() {
-        return {
-            dbArrayAdapter: dbArrayAdapter,
-            addZeros: addZeros
-        };
-        function addZeros(number) {
-            return number < 10 ? '0'.concat(number) : number;
+    var ProcessService = (function () {
+        function ProcessService() {
         }
-        function dbArrayAdapter(dbArray) {
-            var dbObject = {}, tempObj = {}, value;
+        ProcessService.prototype.addZeros = function (number) {
+            return (number < 10 ? '0'.concat(number.toString()) : number.toString);
+        };
+        ProcessService.prototype.dbArrayAdapter = function (dbArray) {
+            var dbObject = {};
+            var tempObj = {};
+            var value;
             if (typeof dbArray !== 'object') {
                 return tempObj;
             }
@@ -33,6 +31,9 @@
                 dbObject[tempObj.id] = tempObj;
             });
             return dbObject;
-        }
-    }
+        };
+        ProcessService.$inject = [];
+        return ProcessService;
+    }());
+    angular.module('app').service('processService', ProcessService);
 })();

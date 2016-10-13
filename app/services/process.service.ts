@@ -1,25 +1,24 @@
-(function(){
+(()=>{
 	'use strict';
-	angular.module('app').factory('processService', processService);
 
-	processService.$inject = [];
+	class ProcessService{
+		static $inject: any[] = [];
 
-	function processService() {
-		return {
-      dbArrayAdapter: dbArrayAdapter,
-			addZeros: addZeros
-    };
+		constructor(){ }
 
-		function addZeros(number){
-			return number < 10 ? '0'.concat(number) : number;
+		public addZeros(number: number): string{
+			return <string>(number < 10 ? '0'.concat(number.toString()) : number.toString);
 		}
 
-    function dbArrayAdapter(dbArray){
-      var dbObject = {}, tempObj = {}, value;
+    public dbArrayAdapter(dbArray: any[]): any{
+      let dbObject: Object = {};
+			let tempObj: any = {};
+			let value: any;
+
       if(typeof dbArray !== 'object'){
         return tempObj;
       }
-      dbArray.forEach(function(object){
+      dbArray.forEach((object: any)=>{
         tempObj = {};
         for(var key in object){
           value = object[key];
@@ -38,6 +37,7 @@
       });
       return dbObject;
     }
-
 	}
+
+	angular.module('app').service('processService', ProcessService);
 })();

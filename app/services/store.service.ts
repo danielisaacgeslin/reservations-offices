@@ -1,258 +1,239 @@
-(function(){
+(()=>{
 	'use strict';
-	angular.module('app').factory('storeService', storeService);
 
-	storeService.$inject = ['ajaxService', 'processService', '$q'];
+	class StoreService{
+		static $inject:any[] = ['ajaxService', 'processService', '$q'];
+    private reservations: any = {};
+		private comments: any = {};
+		private tags: any = {};
+		private spaces: any = {};
+		private currentUser: IUser = {};
+		private currentUserDefer: any;
 
-	function storeService(ajaxService, processService, $q) {
-    var reservations = {}, comments = {}, tags = {}, spaces = {}, currentUser = {};
+		constructor(private ajaxService: any, private processService: any, private $q: ng.IQService){
 
-		var currentUserDefer = null;
+		}
 
-		return {
-      getReservation: getReservation,
-      getReservationList: getReservationList,
-      getReservationTagList: getReservationTagList,
-      getComments: getComments,
-      getTags: getTags,
-			getCurrentUser: getCurrentUser,
-			getSpaces: getSpaces,
-
-      setReservation: setReservation,
-      setTag: setTag,
-      setComment: setComment,
-
-      deleteTag: deleteTag,
-      deleteReservation: deleteReservation,
-      deleteComment: deleteComment,
-
-      resetReservations: resetReservations,
-      resetComments: resetComments,
-      resetTags: resetTags,
-			resetCurrentUser: resetCurrentUser,
-
-			logout: logout
-    };
-
-		function logout(){
-			var defer = $q.defer();
-			ajaxService.logout().then(function(){
-				resetCurrentUser();
-				resetReservations();
-				resetTags();
-				resetComments();
+		public logout(): ng.IPromise<any>{
+			const defer = this.$q.defer();
+			this.ajaxService.logout().then(()=>{
+				this.resetCurrentUser();
+				this.resetReservations();
+				this.resetTags();
+				this.resetComments();
 				defer.resolve();
 			});
 			return defer.promise;
 		}
 
-		function getCurrentUser(){
-			var adapted = null;
-			var firstRequest = false;
+		public getCurrentUser(): ng.IPromise<IUser>{
+			let adapted = null;
+			let firstRequest = false;
 
-			if(!currentUserDefer){
+			if(!this.currentUserDefer){
 				firstRequest = true;
-				currentUserDefer = $q.defer();
+				this.currentUserDefer = this.$q.defer();
 			}
 
-			if(currentUser.id){
-				currentUserDefer.resolve(currentUser);
+			if(this.currentUser.id){
+				this.currentUserDefer.resolve(this.currentUser);
 			}
 
-			if(!currentUser.id && firstRequest){
-				ajaxService.getCurrentUser().then(function(response){
-					adapted = processService.dbArrayAdapter([response.data.payload]);
-					currentUser = adapted[Object.keys(adapted)[0]];
-					currentUserDefer.resolve(currentUser);
+			if(!this.currentUser.id && firstRequest){
+				this.ajaxService.getCurrentUser().then((response: any)=>{
+					adapted = this.processService.dbArrayAdapter([response.data.payload]);
+					this.currentUser = adapted[Object.keys(adapted)[0]];
+					this.currentUserDefer.resolve(this.currentUser);
 				});
 			}
 
-			return currentUserDefer.promise;
+			return this.currentUserDefer.promise;
 		}
 
-    function getReservation(reservationId){
-      var defer = $q.defer();
-      var reservation;
-      if(reservations[reservationId]){
-        defer.resolve(reservations[reservationId]);
+    public getReservation(reservationId: number): ng.IPromise<IReservation>{
+      const defer = this.$q.defer();
+      let reservation;
+      if(this.reservations[reservationId]){
+        defer.resolve(this.reservations[reservationId]);
       }else{
-        ajaxService.getReservation(reservationId).then(function(response){
+        this.ajaxService.getReservation(reservationId).then((response: any)=>{
 					if(!response.data.payload.length){
 						defer.reject();
 						return defer.promise;
 					}
-          reservation = processService.dbArrayAdapter(response.data.payload);
-          reservations[reservationId] = reservation[Object.keys(reservation)[0]];
-					defer.resolve(reservations[reservationId]);
+          reservation = this.processService.dbArrayAdapter(response.data.payload);
+          this.reservations[reservationId] = reservation[Object.keys(reservation)[0]];
+					defer.resolve(this.reservations[reservationId]);
         });
       }
       return defer.promise;
     }
 
-    function getReservationList(month, year){
-      var defer = $q.defer();
-      ajaxService.getReservationList(month, year).then(function(response){
+    public getReservationList(month: number, year: number): ng.IPromise<any>{
+      const defer = this.$q.defer();
+      this.ajaxService.getReservationList(month, year).then((response: any)=>{
         /*keeping old reservations as they were stored*/
-        reservations = Object.assign(processService.dbArrayAdapter(response.data.payload), reservations);
-        defer.resolve(reservations);
+        this.reservations = Object.assign(this.processService.dbArrayAdapter(response.data.payload), this.reservations);
+        defer.resolve(this.reservations);
       });
       return defer.promise;
     }
 
-    function getReservationTagList(reservationId){
-      var defer = $q.defer();
-			var reservationTags;
-			ajaxService.getReservationTagList(reservationId).then(function(response){
-				reservationTags = processService.dbArrayAdapter(response.data.payload);
-				Object.assign(tags, reservationTags);
-				reservations[reservationId].tags = reservationTags;
+    public getReservationTagList(reservationId: number): ng.IPromise<any>{
+      const defer = this.$q.defer();
+			let reservationTags;
+			this.ajaxService.getReservationTagList(reservationId).then((response: any)=>{
+				reservationTags = this.processService.dbArrayAdapter(response.data.payload);
+				Object.assign(this.tags, reservationTags);
+				this.reservations[reservationId].tags = reservationTags;
         defer.resolve(reservationTags);
 			});
       return defer.promise;
     }
 
-    function getComments(reservationId){
-      var defer = $q.defer();
-      var newComments;
-      ajaxService.getComments(reservationId).then(function(response){
-        newComments = processService.dbArrayAdapter(response.data.payload);
-        Object.assign(comments,newComments);
-        reservations[reservationId].comments = newComments;
+    public getComments(reservationId: number): ng.IPromise<any>{
+      const defer = this.$q.defer();
+      let newComments;
+      this.ajaxService.getComments(reservationId).then((response: any)=>{
+        newComments = this.processService.dbArrayAdapter(response.data.payload);
+        Object.assign(this.comments,newComments);
+        this.reservations[reservationId].comments = newComments;
         defer.resolve();
       });
       return defer.promise;
     }
 
-    function getTags(){
-      var defer = $q.defer();
-			if(Object.keys(tags).length){
-				defer.resolve(tags);
+    public getTags(): ng.IPromise<any>{
+      const defer = this.$q.defer();
+			if(Object.keys(this.tags).length){
+				defer.resolve(this.tags);
 			}else{
-				ajaxService.getTags().then(function(response){
-					tags = Object.assign(processService.dbArrayAdapter(response.data.payload), tags);
-					defer.resolve(tags);
+				this.ajaxService.getTags().then((response: any)=>{
+					this.tags = Object.assign(this.processService.dbArrayAdapter(response.data.payload), this.tags);
+					defer.resolve(this.tags);
 				});
 			}
       return defer.promise;
     }
 
-		function getSpaces(){
-      var defer = $q.defer();
-			if(Object.keys(spaces).length){
-				defer.resolve(spaces);
+		public getSpaces(): ng.IPromise<any>{
+      const defer = this.$q.defer();
+			if(Object.keys(this.spaces).length){
+				defer.resolve(this.spaces);
 			}else{
-				ajaxService.getSpaces().then(function(response){
-					spaces = Object.assign(processService.dbArrayAdapter(response.data.payload), spaces);
-					defer.resolve(spaces);
+				this.ajaxService.getSpaces().then((response: any)=>{
+					this.spaces = Object.assign(this.processService.dbArrayAdapter(response.data.payload), this.spaces);
+					defer.resolve(this.spaces);
 				});
 			}
       return defer.promise;
     }
 
-    function setReservation(obj){
-      var defer = $q.defer();
+    public setReservation(obj: any): ng.IPromise<number>{
+      const defer = this.$q.defer();
       /*save*/
       if(!obj.reservation_id){
-        ajaxService.saveReservation(obj).then(function(response){
+        this.ajaxService.saveReservation(obj).then((response: any)=>{
           defer.resolve(response.data.payload);
         });
       /*update*/
       }else{
-        ajaxService.updateReservation(obj).then(function(response){
-          resetReservation(obj.reservation_id);
+        this.ajaxService.updateReservation(obj).then((response: any)=>{
+          this.resetReservation(obj.reservation_id);
           defer.resolve(obj.reservation_id);
         });
       }
       return defer.promise;
     }
 
-    function setTag(reservationId, tagId, tag){
-      var defer = $q.defer();
-			ajaxService.addTag(reservationId, tagId).then(function(response){
+    public setTag(reservationId: number, tagId: number, tag: ITag): ng.IPromise<any>{
+      const defer = this.$q.defer();
+			this.ajaxService.addTag(reservationId, tagId).then((response: any)=>{
 				defer.resolve(response.data.payload);
 			});
       return defer.promise;
     }
 
-    function setComment(comment, reservationId, commentId){
-      var defer = $q.defer();
-			var newComment = {};
-      if(comment, commentId){
-        ajaxService.updateComment(comment, commentId).then(function(response){
-          comments[commentId].text = comment;
+    public setComment(comment: string, reservationId: number, commentId: number): ng.IPromise<any>{
+      const defer = this.$q.defer();
+			let newComment = {};
+      if(comment && commentId){
+        this.ajaxService.updateComment(comment, commentId).then((response: any)=>{
+          this.comments[commentId].text = comment;
           defer.resolve(response);
         });
       }else{
-        ajaxService.saveComment(comment, reservationId).then(function(response){
+        this.ajaxService.saveComment(comment, reservationId).then((response: any)=>{
           newComment = {
 						id: response.data.payload,
 						text: comment,
 						creation_timestamp: new Date(),
-						creation_user: currentUser.id,
-						floor: currentUser.floor,
-						department: currentUser.department
+						creation_user: this.currentUser.id,
+						floor: this.currentUser.floor,
+						department: this.currentUser.department
 					};
-					comments[response.data.payload] = newComment;
-					reservations[reservationId].comments[response.data.payload] = newComment;
+					this.comments[response.data.payload] = newComment;
+					this.reservations[reservationId].comments[response.data.payload] = newComment;
           defer.resolve(response);
         });
       }
       return defer.promise;
     }
 
-    function deleteTag(reservationId, tagId){
-      var defer = $q.defer();
-			ajaxService.removeTag(reservationId, tagId).then(function(response){
-				delete reservations[reservationId].tags[tagId];
+    public deleteTag(reservationId: number, tagId: number): ng.IPromise<any>{
+      const defer = this.$q.defer();
+			this.ajaxService.removeTag(reservationId, tagId).then((response: any)=>{
+				delete this.reservations[reservationId].tags[tagId];
 				defer.resolve();
 			});
       return defer.promise;
     }
 
-    function deleteReservation(reservationId){
-      var defer = $q.defer();
-      ajaxService.deleteReservation(reservationId).then(function(response){
-        if(reservations[reservationId].comments){
-          for(var key in reservations[reservationId].comments){
-            delete comments[key];
+    public deleteReservation(reservationId: number): ng.IPromise<any>{
+      const defer = this.$q.defer();
+      this.ajaxService.deleteReservation(reservationId).then((response: any)=>{
+        if(this.reservations[reservationId].comments){
+          for(let key in this.reservations[reservationId].comments){
+            delete this.comments[key];
           }
         }
-        delete reservations[reservationId];
+        delete this.reservations[reservationId];
         defer.resolve(response);
       });
       return defer.promise;
     }
 
-    function deleteComment(commentId, reservationId){
-      var defer = $q.defer();
-      ajaxService.deleteComment(commentId).then(function(response){
-        delete comments[commentId];
-        delete reservations[reservationId].comments[commentId];
+    public deleteComment(commentId: number, reservationId: number): ng.IPromise<any>{
+      const defer = this.$q.defer();
+      this.ajaxService.deleteComment(commentId).then((response: any)=>{
+        delete this.comments[commentId];
+        delete this.reservations[reservationId].comments[commentId];
         defer.resolve(response);
       });
       return defer.promise;
     }
 
-    function resetReservations(){
-      reservations = {};
+    public resetReservations(): void{
+      this.reservations = {};
     }
 
-    function resetReservation(reservationId){
-      delete reservations[reservationId];
+    public resetReservation(reservationId: number): void{
+      delete this.reservations[reservationId];
     }
 
-    function resetTags(){
-      tags = {};
+    public resetTags(): void{
+      this.tags = {};
     }
 
-    function resetComments(){
-      comments = {};
+    public resetComments(): void{
+      this.comments = {};
     }
 
-		function resetCurrentUser(){
-			currentUserDefer = null;
-      currentUser = {};
+		public resetCurrentUser(): void{
+			this.currentUserDefer = null;
+      this.currentUser = {};
     }
-
 	}
+
+	angular.module('app').service('storeService', StoreService);
 })();

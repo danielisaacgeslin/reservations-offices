@@ -22,21 +22,21 @@
 		}
 
 		/*private functions*/
-		init(): void{
+		private init(): void{
 			this.getReservationList();
 			this.storeService.getCurrentUser().then((user:IUser)=>{
 				this.currentUser = <IUser>user;
 			});
 		}
 
-		toastSuccess(): ng.IPromise<any>{
+		private toastSuccess(): ng.IPromise<any>{
 			const defer = this.$q.defer();
 			this.$rootScope.$broadcast('OK', '');
 			defer.resolve();
 			return defer.promise;
 		}
 
-		getReservationList(): void{
+		public getReservationList(): void{
 			const month: number = this.date.getMonth() + 1;
 			const year: number = this.date.getFullYear();
 
@@ -50,7 +50,7 @@
 		/*end private functions*/
 
 		/*public functions*/
-		deleteReservation(reservationId: number): void{
+		public deleteReservation(reservationId: number): void{
 			const date: Date = this.reservations[reservationId].date;
 			const title: string = 'About to delete a reservation';
 			const body: string = 'You are about to delete "'
@@ -84,21 +84,21 @@
 			});
 		}
 
-		switchVisualization(visualization: string): void{
+		public switchVisualization(visualization: string): void{
 			this.visualization = visualization;
 		}
 
-		next(): void{
+		public next(): void{
 			this.date.setMonth(this.date.getMonth() + 1);
 			this.getReservationList();
 		}
 
-		prev(): void{
+		public prev(): void{
 			this.date.setMonth(this.date.getMonth() - 1);
 			this.getReservationList();
 		}
 
-		checkVaidity(date): boolean{
+		public checkVaidity(date): boolean{
 			const time: number = date.getTime();
 			const yesterday: number = new Date().setDate(new Date().getDate() - 1);
 			return time > yesterday;

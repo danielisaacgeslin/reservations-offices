@@ -1,228 +1,230 @@
 (function () {
     'use strict';
-    angular.module('app').factory('storeService', storeService);
-    storeService.$inject = ['ajaxService', 'processService', '$q'];
-    function storeService(ajaxService, processService, $q) {
-        var reservations = {}, comments = {}, tags = {}, spaces = {}, currentUser = {};
-        var currentUserDefer = null;
-        return {
-            getReservation: getReservation,
-            getReservationList: getReservationList,
-            getReservationTagList: getReservationTagList,
-            getComments: getComments,
-            getTags: getTags,
-            getCurrentUser: getCurrentUser,
-            getSpaces: getSpaces,
-            setReservation: setReservation,
-            setTag: setTag,
-            setComment: setComment,
-            deleteTag: deleteTag,
-            deleteReservation: deleteReservation,
-            deleteComment: deleteComment,
-            resetReservations: resetReservations,
-            resetComments: resetComments,
-            resetTags: resetTags,
-            resetCurrentUser: resetCurrentUser,
-            logout: logout
-        };
-        function logout() {
-            var defer = $q.defer();
-            ajaxService.logout().then(function () {
-                resetCurrentUser();
-                resetReservations();
-                resetTags();
-                resetComments();
+    var StoreService = (function () {
+        function StoreService(ajaxService, processService, $q) {
+            this.ajaxService = ajaxService;
+            this.processService = processService;
+            this.$q = $q;
+            this.reservations = {};
+            this.comments = {};
+            this.tags = {};
+            this.spaces = {};
+            this.currentUser = {};
+        }
+        StoreService.prototype.logout = function () {
+            var _this = this;
+            var defer = this.$q.defer();
+            this.ajaxService.logout().then(function () {
+                _this.resetCurrentUser();
+                _this.resetReservations();
+                _this.resetTags();
+                _this.resetComments();
                 defer.resolve();
             });
             return defer.promise;
-        }
-        function getCurrentUser() {
+        };
+        StoreService.prototype.getCurrentUser = function () {
+            var _this = this;
             var adapted = null;
             var firstRequest = false;
-            if (!currentUserDefer) {
+            if (!this.currentUserDefer) {
                 firstRequest = true;
-                currentUserDefer = $q.defer();
+                this.currentUserDefer = this.$q.defer();
             }
-            if (currentUser.id) {
-                currentUserDefer.resolve(currentUser);
+            if (this.currentUser.id) {
+                this.currentUserDefer.resolve(this.currentUser);
             }
-            if (!currentUser.id && firstRequest) {
-                ajaxService.getCurrentUser().then(function (response) {
-                    adapted = processService.dbArrayAdapter([response.data.payload]);
-                    currentUser = adapted[Object.keys(adapted)[0]];
-                    currentUserDefer.resolve(currentUser);
+            if (!this.currentUser.id && firstRequest) {
+                this.ajaxService.getCurrentUser().then(function (response) {
+                    adapted = _this.processService.dbArrayAdapter([response.data.payload]);
+                    _this.currentUser = adapted[Object.keys(adapted)[0]];
+                    _this.currentUserDefer.resolve(_this.currentUser);
                 });
             }
-            return currentUserDefer.promise;
-        }
-        function getReservation(reservationId) {
-            var defer = $q.defer();
+            return this.currentUserDefer.promise;
+        };
+        StoreService.prototype.getReservation = function (reservationId) {
+            var _this = this;
+            var defer = this.$q.defer();
             var reservation;
-            if (reservations[reservationId]) {
-                defer.resolve(reservations[reservationId]);
+            if (this.reservations[reservationId]) {
+                defer.resolve(this.reservations[reservationId]);
             }
             else {
-                ajaxService.getReservation(reservationId).then(function (response) {
+                this.ajaxService.getReservation(reservationId).then(function (response) {
                     if (!response.data.payload.length) {
                         defer.reject();
                         return defer.promise;
                     }
-                    reservation = processService.dbArrayAdapter(response.data.payload);
-                    reservations[reservationId] = reservation[Object.keys(reservation)[0]];
-                    defer.resolve(reservations[reservationId]);
+                    reservation = _this.processService.dbArrayAdapter(response.data.payload);
+                    _this.reservations[reservationId] = reservation[Object.keys(reservation)[0]];
+                    defer.resolve(_this.reservations[reservationId]);
                 });
             }
             return defer.promise;
-        }
-        function getReservationList(month, year) {
-            var defer = $q.defer();
-            ajaxService.getReservationList(month, year).then(function (response) {
-                reservations = Object.assign(processService.dbArrayAdapter(response.data.payload), reservations);
-                defer.resolve(reservations);
+        };
+        StoreService.prototype.getReservationList = function (month, year) {
+            var _this = this;
+            var defer = this.$q.defer();
+            this.ajaxService.getReservationList(month, year).then(function (response) {
+                _this.reservations = Object.assign(_this.processService.dbArrayAdapter(response.data.payload), _this.reservations);
+                defer.resolve(_this.reservations);
             });
             return defer.promise;
-        }
-        function getReservationTagList(reservationId) {
-            var defer = $q.defer();
+        };
+        StoreService.prototype.getReservationTagList = function (reservationId) {
+            var _this = this;
+            var defer = this.$q.defer();
             var reservationTags;
-            ajaxService.getReservationTagList(reservationId).then(function (response) {
-                reservationTags = processService.dbArrayAdapter(response.data.payload);
-                Object.assign(tags, reservationTags);
-                reservations[reservationId].tags = reservationTags;
+            this.ajaxService.getReservationTagList(reservationId).then(function (response) {
+                reservationTags = _this.processService.dbArrayAdapter(response.data.payload);
+                Object.assign(_this.tags, reservationTags);
+                _this.reservations[reservationId].tags = reservationTags;
                 defer.resolve(reservationTags);
             });
             return defer.promise;
-        }
-        function getComments(reservationId) {
-            var defer = $q.defer();
+        };
+        StoreService.prototype.getComments = function (reservationId) {
+            var _this = this;
+            var defer = this.$q.defer();
             var newComments;
-            ajaxService.getComments(reservationId).then(function (response) {
-                newComments = processService.dbArrayAdapter(response.data.payload);
-                Object.assign(comments, newComments);
-                reservations[reservationId].comments = newComments;
+            this.ajaxService.getComments(reservationId).then(function (response) {
+                newComments = _this.processService.dbArrayAdapter(response.data.payload);
+                Object.assign(_this.comments, newComments);
+                _this.reservations[reservationId].comments = newComments;
                 defer.resolve();
             });
             return defer.promise;
-        }
-        function getTags() {
-            var defer = $q.defer();
-            if (Object.keys(tags).length) {
-                defer.resolve(tags);
+        };
+        StoreService.prototype.getTags = function () {
+            var _this = this;
+            var defer = this.$q.defer();
+            if (Object.keys(this.tags).length) {
+                defer.resolve(this.tags);
             }
             else {
-                ajaxService.getTags().then(function (response) {
-                    tags = Object.assign(processService.dbArrayAdapter(response.data.payload), tags);
-                    defer.resolve(tags);
+                this.ajaxService.getTags().then(function (response) {
+                    _this.tags = Object.assign(_this.processService.dbArrayAdapter(response.data.payload), _this.tags);
+                    defer.resolve(_this.tags);
                 });
             }
             return defer.promise;
-        }
-        function getSpaces() {
-            var defer = $q.defer();
-            if (Object.keys(spaces).length) {
-                defer.resolve(spaces);
+        };
+        StoreService.prototype.getSpaces = function () {
+            var _this = this;
+            var defer = this.$q.defer();
+            if (Object.keys(this.spaces).length) {
+                defer.resolve(this.spaces);
             }
             else {
-                ajaxService.getSpaces().then(function (response) {
-                    spaces = Object.assign(processService.dbArrayAdapter(response.data.payload), spaces);
-                    defer.resolve(spaces);
+                this.ajaxService.getSpaces().then(function (response) {
+                    _this.spaces = Object.assign(_this.processService.dbArrayAdapter(response.data.payload), _this.spaces);
+                    defer.resolve(_this.spaces);
                 });
             }
             return defer.promise;
-        }
-        function setReservation(obj) {
-            var defer = $q.defer();
+        };
+        StoreService.prototype.setReservation = function (obj) {
+            var _this = this;
+            var defer = this.$q.defer();
             if (!obj.reservation_id) {
-                ajaxService.saveReservation(obj).then(function (response) {
+                this.ajaxService.saveReservation(obj).then(function (response) {
                     defer.resolve(response.data.payload);
                 });
             }
             else {
-                ajaxService.updateReservation(obj).then(function (response) {
-                    resetReservation(obj.reservation_id);
+                this.ajaxService.updateReservation(obj).then(function (response) {
+                    _this.resetReservation(obj.reservation_id);
                     defer.resolve(obj.reservation_id);
                 });
             }
             return defer.promise;
-        }
-        function setTag(reservationId, tagId, tag) {
-            var defer = $q.defer();
-            ajaxService.addTag(reservationId, tagId).then(function (response) {
+        };
+        StoreService.prototype.setTag = function (reservationId, tagId, tag) {
+            var defer = this.$q.defer();
+            this.ajaxService.addTag(reservationId, tagId).then(function (response) {
                 defer.resolve(response.data.payload);
             });
             return defer.promise;
-        }
-        function setComment(comment, reservationId, commentId) {
-            var defer = $q.defer();
+        };
+        StoreService.prototype.setComment = function (comment, reservationId, commentId) {
+            var _this = this;
+            var defer = this.$q.defer();
             var newComment = {};
-            if (comment, commentId) {
-                ajaxService.updateComment(comment, commentId).then(function (response) {
-                    comments[commentId].text = comment;
+            if (comment && commentId) {
+                this.ajaxService.updateComment(comment, commentId).then(function (response) {
+                    _this.comments[commentId].text = comment;
                     defer.resolve(response);
                 });
             }
             else {
-                ajaxService.saveComment(comment, reservationId).then(function (response) {
+                this.ajaxService.saveComment(comment, reservationId).then(function (response) {
                     newComment = {
                         id: response.data.payload,
                         text: comment,
                         creation_timestamp: new Date(),
-                        creation_user: currentUser.id,
-                        floor: currentUser.floor,
-                        department: currentUser.department
+                        creation_user: _this.currentUser.id,
+                        floor: _this.currentUser.floor,
+                        department: _this.currentUser.department
                     };
-                    comments[response.data.payload] = newComment;
-                    reservations[reservationId].comments[response.data.payload] = newComment;
+                    _this.comments[response.data.payload] = newComment;
+                    _this.reservations[reservationId].comments[response.data.payload] = newComment;
                     defer.resolve(response);
                 });
             }
             return defer.promise;
-        }
-        function deleteTag(reservationId, tagId) {
-            var defer = $q.defer();
-            ajaxService.removeTag(reservationId, tagId).then(function (response) {
-                delete reservations[reservationId].tags[tagId];
+        };
+        StoreService.prototype.deleteTag = function (reservationId, tagId) {
+            var _this = this;
+            var defer = this.$q.defer();
+            this.ajaxService.removeTag(reservationId, tagId).then(function (response) {
+                delete _this.reservations[reservationId].tags[tagId];
                 defer.resolve();
             });
             return defer.promise;
-        }
-        function deleteReservation(reservationId) {
-            var defer = $q.defer();
-            ajaxService.deleteReservation(reservationId).then(function (response) {
-                if (reservations[reservationId].comments) {
-                    for (var key in reservations[reservationId].comments) {
-                        delete comments[key];
+        };
+        StoreService.prototype.deleteReservation = function (reservationId) {
+            var _this = this;
+            var defer = this.$q.defer();
+            this.ajaxService.deleteReservation(reservationId).then(function (response) {
+                if (_this.reservations[reservationId].comments) {
+                    for (var key in _this.reservations[reservationId].comments) {
+                        delete _this.comments[key];
                     }
                 }
-                delete reservations[reservationId];
+                delete _this.reservations[reservationId];
                 defer.resolve(response);
             });
             return defer.promise;
-        }
-        function deleteComment(commentId, reservationId) {
-            var defer = $q.defer();
-            ajaxService.deleteComment(commentId).then(function (response) {
-                delete comments[commentId];
-                delete reservations[reservationId].comments[commentId];
+        };
+        StoreService.prototype.deleteComment = function (commentId, reservationId) {
+            var _this = this;
+            var defer = this.$q.defer();
+            this.ajaxService.deleteComment(commentId).then(function (response) {
+                delete _this.comments[commentId];
+                delete _this.reservations[reservationId].comments[commentId];
                 defer.resolve(response);
             });
             return defer.promise;
-        }
-        function resetReservations() {
-            reservations = {};
-        }
-        function resetReservation(reservationId) {
-            delete reservations[reservationId];
-        }
-        function resetTags() {
-            tags = {};
-        }
-        function resetComments() {
-            comments = {};
-        }
-        function resetCurrentUser() {
-            currentUserDefer = null;
-            currentUser = {};
-        }
-    }
+        };
+        StoreService.prototype.resetReservations = function () {
+            this.reservations = {};
+        };
+        StoreService.prototype.resetReservation = function (reservationId) {
+            delete this.reservations[reservationId];
+        };
+        StoreService.prototype.resetTags = function () {
+            this.tags = {};
+        };
+        StoreService.prototype.resetComments = function () {
+            this.comments = {};
+        };
+        StoreService.prototype.resetCurrentUser = function () {
+            this.currentUserDefer = null;
+            this.currentUser = {};
+        };
+        StoreService.$inject = ['ajaxService', 'processService', '$q'];
+        return StoreService;
+    }());
+    angular.module('app').service('storeService', StoreService);
 })();
