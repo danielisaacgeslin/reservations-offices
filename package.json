@@ -13,7 +13,7 @@
     "typings": "typings install",
     "ts": "gulp ts",
     "test": "karma start karma.conf.js",
-    "full-install": "npm install && npm run bower && typings install",
+    "postinstall": "npm run bower && typings install",
     "push": "git add * && git commit -m update && git push"
   },
   "devDependencies": {
