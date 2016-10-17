@@ -5,34 +5,36 @@
 
   toaster.$inject = ['constants'];
 
-	function toaster(constants: any): ng.IDirective {
-
-		class Link{
-			private timeout: number = 0;
-			constructor(public $scope: any, public $element: any, $attr: any){
-				this.$scope.$watch('data', this.toast);
-			}
-
-			toast(): boolean{
-				if(!this.$scope.data.type){
-					return false;
-				}
-				clearTimeout(this.timeout);
-				this.timeout = setTimeout(()=>{
-					this.$scope.data = {};
-					this.$scope.$digest();
-				}, constants.toasterTime);
-				return true;
-			}
-		}
-
+	function toaster(constants: any): ng.IDirective{
     return {
       restrict: 'E',
       templateUrl: 'toaster.directive.html',
-      link: Link,
+      link: link,
       scope: {
         data: '='
       }
     };
+
+		function link ($scope: any, $element: any, $attr: any){
+			let timeout: number = 0;
+
+			init();
+
+			function init(): void{
+				$scope.$watch(()=>$scope.data, toast);
+			}
+
+			function toast(): boolean{
+				if(!$scope.data.type){
+					return false;
+				}
+				clearTimeout(timeout);
+				timeout = setTimeout(()=>{
+					$scope.data = {};
+					$scope.$digest();
+				}, constants.toasterTime);
+				return true;
+			}
+		}
 	}
 })();
