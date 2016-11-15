@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-09-2016 a las 22:48:28
+-- Tiempo de generación: 15-11-2016 a las 15:17:06
 -- Versión del servidor: 10.1.13-MariaDB
 -- Versión de PHP: 7.0.8
 
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `RESERVATIONS`
+-- Base de datos: `RESERVATIONS_offices`
 --
 
 -- --------------------------------------------------------
@@ -47,11 +47,34 @@ CREATE TABLE `RESERVATIONS` (
   `TITLE` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
   `DESCRIPTION` varchar(350) COLLATE utf8_unicode_ci DEFAULT NULL,
   `BODY` text COLLATE utf8_unicode_ci,
+  `SPACE` int(11) NOT NULL,
   `DATE` date NOT NULL,
-  `TIME` tinyint(4) NOT NULL,
+  `FROM_TIME` int(11) NOT NULL,
+  `TO_TIME` int(11) NOT NULL,
   `CREATION_USER` int(11) NOT NULL,
   `EDITION_USER` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `SPACES`
+--
+
+CREATE TABLE `SPACES` (
+  `ID` int(11) NOT NULL,
+  `TEXT` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `CREATION_TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATION_USER` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `SPACES`
+--
+
+INSERT INTO `SPACES` (`ID`, `TEXT`, `CREATION_TIMESTAMP`, `CREATION_USER`) VALUES
+(1, 'MARIO ROOM', '2016-10-06 17:23:30', 1),
+(2, 'SONIC ROOM', '2016-10-06 17:23:30', 1);
 
 -- --------------------------------------------------------
 
@@ -71,9 +94,8 @@ CREATE TABLE `TAGS` (
 --
 
 INSERT INTO `TAGS` (`ID`, `TEXT`, `CREATION_TIMESTAMP`, `CREATION_USER`) VALUES
-(1, 'SUM', '2016-09-06 13:05:34', 1),
-(2, 'pool', '2016-09-06 13:05:34', 1),
-(3, 'grill', '2016-09-06 13:05:50', 1);
+(4, 'MEETING', '2016-10-06 13:31:20', 1),
+(5, 'TRAINING', '2016-10-06 13:31:20', 1);
 
 -- --------------------------------------------------------
 
@@ -112,7 +134,8 @@ CREATE TABLE `USERS` (
 --
 
 INSERT INTO `USERS` (`ID`, `USERNAME`, `PASSWORD`, `FIRST_NAME`, `LAST_NAME`, `EMAIL`, `FLOOR`, `DEPARTMENT`, `ROLE`, `CREATION_TIMESTAMP`) VALUES
-(1, 'dgeslin', '5f4dcc3b5aa765d61d8327deb882cf99', 'Daniel', 'Geslin', 'danielisaacgeslin@gmail.com', 4, 2, 1, '2016-08-31 15:14:25');
+(1, 'dgeslin', '5f4dcc3b5aa765d61d8327deb882cf99', 'Daniel', 'Geslin', 'danielisaacgeslin@gmail.com', 4, 2, 1, '2016-08-31 15:14:25'),
+(2, 'tester', '5f4dcc3b5aa765d61d8327deb882cf99', 'Tester', 'Simpson', 'tester@simpson.com', 6, 3, 2, '2016-09-14 13:43:30');
 
 --
 -- Índices para tablas volcadas
@@ -141,7 +164,16 @@ ALTER TABLE `RESERVATIONS`
   ADD KEY `CREATION_USER_2` (`CREATION_USER`),
   ADD KEY `CREATION_USER_3` (`CREATION_USER`),
   ADD KEY `CREATION_USER_4` (`CREATION_USER`),
-  ADD KEY `EDITION_USER_2` (`EDITION_USER`);
+  ADD KEY `EDITION_USER_2` (`EDITION_USER`),
+  ADD KEY `SPACE` (`SPACE`);
+
+--
+-- Indices de la tabla `SPACES`
+--
+ALTER TABLE `SPACES`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `TEXT` (`TEXT`),
+  ADD KEY `CREATION_USER` (`CREATION_USER`);
 
 --
 -- Indices de la tabla `TAGS`
@@ -160,7 +192,8 @@ ALTER TABLE `TAG_LISTS`
   ADD KEY `TAG_ID` (`TAG_ID`),
   ADD KEY `ARTICLE_ID` (`RESERVATION_ID`),
   ADD KEY `ARTICLE_ID_2` (`RESERVATION_ID`),
-  ADD KEY `TAG_ID_2` (`TAG_ID`);
+  ADD KEY `TAG_ID_2` (`TAG_ID`),
+  ADD KEY `CREATION_USER` (`CREATION_USER`);
 
 --
 -- Indices de la tabla `USERS`
@@ -176,27 +209,32 @@ ALTER TABLE `USERS`
 -- AUTO_INCREMENT de la tabla `COMMENTS`
 --
 ALTER TABLE `COMMENTS`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT de la tabla `RESERVATIONS`
 --
 ALTER TABLE `RESERVATIONS`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
+--
+-- AUTO_INCREMENT de la tabla `SPACES`
+--
+ALTER TABLE `SPACES`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT de la tabla `TAGS`
 --
 ALTER TABLE `TAGS`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT de la tabla `TAG_LISTS`
 --
 ALTER TABLE `TAG_LISTS`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT de la tabla `USERS`
 --
 ALTER TABLE `USERS`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- Restricciones para tablas volcadas
 --
@@ -214,6 +252,12 @@ ALTER TABLE `COMMENTS`
 ALTER TABLE `RESERVATIONS`
   ADD CONSTRAINT `RESERVATIONS_ibfk_1` FOREIGN KEY (`CREATION_USER`) REFERENCES `USERS` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `RESERVATIONS_ibfk_2` FOREIGN KEY (`EDITION_USER`) REFERENCES `USERS` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `SPACES`
+--
+ALTER TABLE `SPACES`
+  ADD CONSTRAINT `SPACES_ibfk_1` FOREIGN KEY (`CREATION_USER`) REFERENCES `USERS` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `TAGS`

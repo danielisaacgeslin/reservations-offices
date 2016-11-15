@@ -3,7 +3,7 @@
 class Connection {
 
     private function __construct() {
-        
+
     }
 
     static function connect() {

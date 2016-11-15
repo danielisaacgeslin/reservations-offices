@@ -1078,37 +1078,38 @@ require('./controllers/spaces.controller');
 },{}],21:[function(require,module,exports){
 (function () {
     'use strict';
-    var Interceptor = (function () {
-        function Interceptor($q, $rootScope) {
-            this.$q = $q;
-            this.$rootScope = $rootScope;
-        }
-        Interceptor.prototype.request = function (config) {
+    angular.module('app').factory('interceptor', Interceptor);
+    Interceptor.$inject = ['$q', '$rootScope'];
+    function Interceptor($q, $rootScope) {
+        return {
+            request: request,
+            requestError: requestError,
+            response: response,
+            responseError: responseError
+        };
+        function request(config) {
             return config;
-        };
-        Interceptor.prototype.requestError = function (rejection) {
-            return this.$q.reject(rejection);
-        };
-        Interceptor.prototype.response = function (response) {
+        }
+        function requestError(rejection) {
+            return $q.reject(rejection);
+        }
+        function response(response) {
             if (response.data.status === 'ERROR') {
-                this.$rootScope.$broadcast('ERROR', response.data.payload);
-                return this.$q.reject(response);
+                $rootScope.$broadcast('ERROR', response.data.payload);
+                return $q.reject(response);
             }
             return response;
-        };
-        Interceptor.prototype.responseError = function (rejection) {
+        }
+        function responseError(rejection) {
             if (rejection.status === 403) {
-                this.$rootScope.$broadcast('goToLogin');
+                $rootScope.$broadcast('goToLogin');
             }
             if (rejection.status === 400) {
-                this.$rootScope.$broadcast('goToRoot');
+                $rootScope.$broadcast('goToRoot');
             }
-            return this.$q.reject(rejection);
-        };
-        Interceptor.$inject = ['$q', '$rootScope'];
-        return Interceptor;
-    }());
-    angular.module('app').service('interceptor', Interceptor);
+            return $q.reject(rejection);
+        }
+    }
 })();
 
 },{}],22:[function(require,module,exports){

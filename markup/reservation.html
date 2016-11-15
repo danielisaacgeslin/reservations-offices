@@ -1,6 +1,16 @@
 <div id="reservation" class="row">
   <div ng-class="{'col-md-9': vm.editEnabled}" class="col-xs-12">
     <article>
+      <h6>
+        Reservation made by
+        <br>
+        <small>
+          <strong>name: </strong> {{vm.reservation.first_name}} {{vm.reservation.last_name}}
+          <br>
+          <strong>floor & department: </strong> {{vm.reservation.floor}}° {{vm.reservation.department | department}}
+        </small>
+      </h6>
+
       <h3>{{vm.reservation.date | date: 'dd/MM/y'}} {{vm.reservation.time | time}}</h3>
       <ul>
         <li class="label label-default tag" ng-repeat="(id, tag) in vm.reservation.tags">

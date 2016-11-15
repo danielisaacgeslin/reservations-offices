@@ -1,39 +1,40 @@
 (() => {
     'use strict';
+    angular.module('app').factory('interceptor', Interceptor);
 
-    class Interceptor {
-        static $inject: string[] = ['$q', '$rootScope'];
-
-        constructor(private $q: ng.IQService, private $rootScope: ng.IRootScopeService) {
-
+    Interceptor.$inject = ['$q', '$rootScope'];
+    function Interceptor($q, $rootScope) {
+        return {
+          request: request,
+          requestError: requestError,
+          response: response,
+          responseError: responseError
         }
 
-        public request(config: any): any {
+        function request(config: any): any {
             return config;
         }
 
-        public requestError(rejection: any): any {
-            return this.$q.reject(rejection);
+        function requestError(rejection: any): any {
+            return $q.reject(rejection);
         }
 
-        public response(response: any): any {
+        function response(response: any): any {
             if (response.data.status === 'ERROR') {
-                this.$rootScope.$broadcast('ERROR', response.data.payload);
-                return this.$q.reject(response);
+                $rootScope.$broadcast('ERROR', response.data.payload);
+                return $q.reject(response);
             }
             return response;
         }
 
-        public responseError(rejection: any): any {
+        function responseError(rejection: any): any {
             if (rejection.status === 403) {
-                this.$rootScope.$broadcast('goToLogin');
+                $rootScope.$broadcast('goToLogin');
             }
             if (rejection.status === 400) {
-                this.$rootScope.$broadcast('goToRoot');
+                $rootScope.$broadcast('goToRoot');
             }
-            return this.$q.reject(rejection);
+            return $q.reject(rejection);
         }
     }
-
-    angular.module('app').service('interceptor', Interceptor);
 })();
