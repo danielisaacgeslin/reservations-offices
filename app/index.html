@@ -4,11 +4,10 @@
 	<meta charset="UTF-8">
 	<title></title>
 	<link href="css/style.css" rel="stylesheet" type="text/css">
-	<script src="js/main.js" type="text/javascript"></script>
+	<script src="js/vendors.js" type="text/javascript"></script>
 </head>
-<body ng-controller="appController as vm" ng-cloak>
-
-	<header ng-include="'header.html'"></header>
+<body ng-controller="appController as vm">
+	<header ng-include="'markup/header.html'"></header>
 
 	<div class="container" ui-view></div>
 

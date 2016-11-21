@@ -5,10 +5,18 @@ define("ROOT", $_SERVER["DOCUMENT_ROOT"] . "/reservations-offices/api/");
 define("ROOT_URL", "https://" . $_SERVER["SERVER_NAME"] . "/reservations-offices/api/");
 
 /* DATABASE */
+/*dev*/
 define("DATA_BASE", "RESERVATIONS_OFFICES");
 define("HOST", "localhost");
 define("DB_USER", "root");
 define("DB_PASSWORD", "");
+/*production*/
+/*
+define("DATA_BASE", "RESERVATIONS_OFFICES");
+define("HOST", "localhost");
+define("DB_USER", "root");
+define("DB_PASSWORD", "");
+*/
 
 /* RESPONSES */
 define("OK", "OK");

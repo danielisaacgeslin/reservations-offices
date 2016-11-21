@@ -1,4 +1,6 @@
 'use strict';
+var pjson = require('./package.json');
+var connect = require('gulp-connect');
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var browserify = require('browserify');
@@ -7,43 +9,77 @@ var cleanCSS = require('gulp-clean-css');
 var uglify = require('gulp-uglify');
 var htmlmin = require('gulp-htmlmin');
 var imagemin = require('gulp-imagemin');
-var connect = require('gulp-connect');
 var jshint = require('gulp-jshint');
-var ngAnnotate = require('gulp-ng-annotate')
+var ngAnnotate = require('gulp-ng-annotate');
 var runSequence = require('run-sequence');
 var ts = require('gulp-typescript');
+var clean = require('gulp-clean');
+var logger = require('gulp-logger');
+var colors = require('colors');
 var Server = require('karma').Server;
 
 var tsProject = ts.createProject('tsconfig.json');
 
 /*usable from terminal*/
-gulp.task('default', function(){
-  runSequence('dev');
-});
-
 gulp.task('dev', function(){
-  runSequence('build', 'lint', 'test', 'connect', 'watch');
+  console.log('development process started'.bgWhite.black);
+  runSequence(
+  'clean',
+  'rootAssets',
+  'main',
+  'ts',
+  'browserify',
+  ['build-css','minify-html','images','fonts','libs'],
+  ['test','lint'],
+  ['watch','connect'],
+  function(){
+    console.log('ready to develop'.bgGreen.black);
+  });
 });
 
 gulp.task('build', function(){
-  runSequence('build-main','libs','ts','build-app','build-css','minify-html','images','fonts', 'lint');
+  console.log('build started'.bgWhite.black);
+  runSequence(
+  'clean',
+  'rootAssets',
+  'main',
+  'minify-main',
+  'ts',
+  'browserify',
+  'minify-js',
+  ['build-css','minify-html','images','fonts','libs'],
+  ['test','lint'],
+  function(){
+    console.log('build complete'.bgGreen.black);
+  }
+);
 });
 
 /*end usable from terminal*/
 
 gulp.task('connect', function() {
-  connect.server({
-  	root: 'public',
+  return connect.server({
+    name: pjson.name,
+  	root: ['./public/'],
     port: 3000,
-    livereload: true
+    livereload: true,
+    fallback: './public/index.html'
   });
 });
 
-gulp.task('test', function (done) {
-  new Server({
+gulp.task('clean', function () {
+    return gulp.src(['./public/','./jshint-output.log'], {read: false})
+        .pipe(clean());
+});
+
+gulp.task('test', function () {
+  console.log('running tests'.bgWhite.black);
+  var a = new Server({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true
-  }, done).start();
+  },function(e){
+    console.log(e.toString().concat(' error/s')[e ? 'bgRed' : 'bgGreen'].black);
+  }).start();
 });
 
 gulp.task('lint', function() {
@@ -62,7 +98,7 @@ gulp.task('images', function(){
 });
 
 gulp.task('browserify', function() {
-	return browserify('./app/generator.js')
+	return browserify('./app/app.js')
 	.bundle().pipe(source('app.js'))
 	.pipe(gulp.dest('public/js/'));
 });
@@ -74,21 +110,14 @@ gulp.task('minify-js', function() {
     .pipe(gulp.dest('public/js/'));
 });
 
-gulp.task('brows-dev', function(){
-	return browserify('./app/generator.js')
-	.bundle()
-  .pipe(source('app.js'))
-	.pipe(gulp.dest('./public/js/'));
-});
-
 gulp.task('main', function() {
-	return browserify('./main.js')
-	.bundle().pipe(source('main.js'))
+	return browserify('./app/vendors.js')
+	.bundle().pipe(source('vendors.js'))
 	.pipe(gulp.dest('public/js/'));
 });
 
 gulp.task('minify-main', function() {
-  return gulp.src('public/js/main.js')
+  return gulp.src('public/js/vendors.js')
     .pipe(uglify({mangle:true}))
     .pipe(gulp.dest('public/js/'));
 });
@@ -111,7 +140,7 @@ gulp.task('libs', function() {
 });
 
 gulp.task('minify-html', function() {
-  return gulp.src('./markup/**/*.html')
+  return gulp.src('./app/**/*.html')
     .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(gulp.dest('./public/'));
 });
@@ -121,16 +150,8 @@ gulp.task('fonts', function(){
   .pipe(gulp.dest('./public/fonts'));
 });
 
-gulp.task('build-app', function(){
-  runSequence('browserify','minify-js');
-});
-
 gulp.task('build-css', function(){
   runSequence('sass','minify-css');
-});
-
-gulp.task('build-main', function(){
-  runSequence('main','minify-main');
 });
 
 gulp.task('ts', function(){
@@ -139,12 +160,44 @@ gulp.task('ts', function(){
   .pipe(gulp.dest('./app'));
 });
 
+gulp.task('update-js', function(){
+  console.log('updating js'.bgWhite.black);
+  runSequence('ts', 'browserify', 'lint', 'test', 'livereload', function(){
+    console.log('js updated'.bgGreen.black);
+  });
+});
+
+gulp.task('update-css', function(){
+  console.log('updating css'.bgWhite.black);
+  runSequence('sass','minify-css', 'livereload', function(){
+    console.log('css updated'.bgGreen.black);
+  });
+});
+
+gulp.task('update-html', function(){
+  console.log('updating html'.bgWhite.black);
+  runSequence('minify-html', 'livereload', function(){
+    console.log('html updated'.bgGreen.black);
+  });
+});
+
+gulp.task('livereload', function(){
+  console.log(colors.black('reloading browser').bgMagenta);
+  gulp.src('./public/**/*.*')
+    .pipe(connect.reload());
+});
+
+gulp.task('rootAssets', function(){
+  return gulp.src(['./rootAssets/**','./rootAssets/.htaccess'])
+  .pipe(gulp.dest('./public'));
+
+});
+
 gulp.task('watch', function(){
 	gulp.watch('libs/**/*.*', ['libs']);
-  gulp.watch('app/**/*.ts', ['ts']);
-  gulp.watch('app/**/*.js', ['brows-dev','lint']);
-	gulp.watch('./sass/*.scss', [ 'build-css' ]);
-	gulp.watch('markup/**/*.html', ['minify-html']);
+  gulp.watch('app/**/*.ts', ['update-js']);
+	gulp.watch('./sass/*.scss', ['update-css']);
+	gulp.watch('app/**/*.html', ['update-html']);
 	gulp.watch('images/**/*', ['images']);
-  gulp.watch(['app/**/*.js'], ['test', 'lint']);
+  gulp.watch('app/**/*.spec.js', ['test']);
 });

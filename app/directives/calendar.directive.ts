@@ -4,7 +4,7 @@
 	const calendarDirective = (): ng.IDirective =>{
 		return {
 			restrict: 'E',
-			templateUrl: 'calendar.directive.html',
+			templateUrl: 'markup/calendar.directive.html',
 			link: link,
 			scope: {
 					data: '=',

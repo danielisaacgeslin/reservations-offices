@@ -8,7 +8,7 @@
 	function toaster(constants: any): ng.IDirective{
     return {
       restrict: 'E',
-      templateUrl: 'toaster.directive.html',
+      templateUrl: 'markup/toaster.directive.html',
       link: link,
       scope: {
         data: '='

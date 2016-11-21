@@ -7,13 +7,12 @@
 		$stateProvider: ng.ui.IStateProvider,
 		$urlRouterProvider: ng.ui.IUrlRouterProvider,
 	  $httpProvider: ng.IHttpProvider){
-
 		$httpProvider.interceptors.push('interceptor');
 
 		$urlRouterProvider.otherwise('/');
 		$stateProvider.state('/', {
 			url : '/',
-			templateUrl : 'main.html',
+			templateUrl : 'markup/main.html',
 			controller: 'mainController',
 			controllerAs: 'vm',
 			resolve: {ping: ping}
@@ -25,19 +24,19 @@
 			resolve: {checkSession:checkSession}
 		}).state('/reservation', {
 			url : '/reservation/:id/:date',
-      templateUrl : 'reservation.html',
+      templateUrl : 'markup/reservation.html',
       controller: 'reservationController',
       controllerAs: 'vm',
 			resolve: {ping: ping}
 		}).state('/tags', {
 			url : '/tags',
-      templateUrl : 'tags.html',
+      templateUrl : 'markup/tags.html',
       controller: 'tagsController',
       controllerAs: 'vm',
 			resolve: {ping: ping}
 		}).state('/spaces', {
 			url : '/spaces',
-      templateUrl : 'spaces.html',
+      templateUrl : 'markup/spaces.html',
       controller: 'spacesController',
       controllerAs: 'vm',
 			resolve: {ping: ping}
@@ -56,7 +55,8 @@
 
 	function constants(): any{
 		return {
-			serviceUrl: '/reservations-offices/api/',
+			serviceUrl: '/reservations-offices/api/', //dev
+			//serviceUrl: '/api/', //production
 			genericErrorMessage: 'An error has occurred',
 			genericSuccessMessage: 'Operation successfully achieved',
 			toasterTime: 3000

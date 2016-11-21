@@ -15,20 +15,12 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      //'./bower_components/angular',
-      //'./bower_components/angular-ui-router/release/angular-ui-router.js',
-      //'./bower_components/angular-animate',
-      //'./bower_components/angular-bootstrap',
-      './public/js/main.js',
-      './bower_components/angular-mocks/angular-mocks.js',
-      './app/modules/*.js',
-      './app/controllers/*.js',
-      './app/directives/*.js',
-      './app/services/*.js',
-      './app/filters/*.js',
-      './test/**/*.js'
+      './public/js/vendors.js', //angular and dependences
+      './public/js/app.js',
+      {pattern: './public/**/*.html'},
+      './node_modules/angular-mocks/angular-mocks.js',
+      {pattern: './app/**/*.spec.js'}
     ],
-
 
     // list of files to exclude
     exclude: [
@@ -38,13 +30,18 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      '**/*.html': ['ng-html2js']
     },
 
+    ngHtml2JsPreprocessor: {
+        moduleName: 'templates',
+        stripPrefix: 'public/'
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: [/*'progress', */'simple'],
 
 
     // web server port
@@ -76,5 +73,5 @@ module.exports = function(config) {
     // Concurrency level
     // how many browser should be started simultaneous
     concurrency: Infinity
-  })
-}
+  });
+};
