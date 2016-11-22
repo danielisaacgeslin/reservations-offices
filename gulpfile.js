@@ -31,7 +31,7 @@ gulp.task('dev', function(){
   'browserify',
   ['build-css','minify-html','images','fonts','libs'],
   ['test','lint'],
-  ['watch','connect'],
+  ['watch'],
   function(){
     console.log('ready to develop'.bgGreen.black);
   });

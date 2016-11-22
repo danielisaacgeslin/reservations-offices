@@ -12,7 +12,7 @@
             resolve: { ping: ping }
         }).state('/login', {
             url: '/login',
-            templateUrl: 'login.html',
+            templateUrl: 'markup/login.html',
             controller: 'loginController',
             controllerAs: 'vm',
             resolve: { checkSession: checkSession }

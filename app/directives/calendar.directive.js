@@ -1,6 +1,8 @@
 (function () {
     'use strict';
-    var calendarDirective = function () {
+    angular.module('app').directive('calendar', calendarDirective);
+    calendarDirective.$inject = [];
+    function calendarDirective() {
         return {
             restrict: 'E',
             templateUrl: 'markup/calendar.directive.html',
@@ -13,8 +15,7 @@
                 newReservation: '='
             }
         };
-    };
-    angular.module('app').directive('calendar', calendarDirective);
+    }
     function link($scope, element, attributes) {
         var vm = this;
         $scope.checkVaidity = checkVaidity;

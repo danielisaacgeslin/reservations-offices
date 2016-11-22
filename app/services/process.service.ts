@@ -1,16 +1,19 @@
 (() => {
     'use strict';
+    angular.module('app').service('processService', processService);
 
-    class ProcessService {
-        static $inject: string[] = [];
+    processService.$inject = [];
+    function processService() {
+        return {
+            addZeros,
+            dbArrayAdapter
+        };
 
-        constructor() { }
-
-        public addZeros(number: number): string {
+        function addZeros(number: number): string {
             return <string>(number < 10 ? '0'.concat(number.toString()) : number.toString());
         }
 
-        public dbArrayAdapter(dbArray: any[]): any {
+        function dbArrayAdapter(dbArray: any[]): any {
             let dbObject: Object = {};
             let tempObj: any = {};
             let value: any;
@@ -38,6 +41,4 @@
             return dbObject;
         }
     }
-
-    angular.module('app').service('processService', ProcessService);
 })();

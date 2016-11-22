@@ -1,12 +1,16 @@
 (function () {
     'use strict';
-    var ProcessService = (function () {
-        function ProcessService() {
-        }
-        ProcessService.prototype.addZeros = function (number) {
-            return (number < 10 ? '0'.concat(number.toString()) : number.toString());
+    angular.module('app').service('processService', processService);
+    processService.$inject = [];
+    function processService() {
+        return {
+            addZeros: addZeros,
+            dbArrayAdapter: dbArrayAdapter
         };
-        ProcessService.prototype.dbArrayAdapter = function (dbArray) {
+        function addZeros(number) {
+            return (number < 10 ? '0'.concat(number.toString()) : number.toString());
+        }
+        function dbArrayAdapter(dbArray) {
             var dbObject = {};
             var tempObj = {};
             var value;
@@ -31,9 +35,6 @@
                 dbObject[tempObj.id] = tempObj;
             });
             return dbObject;
-        };
-        ProcessService.$inject = [];
-        return ProcessService;
-    }());
-    angular.module('app').service('processService', ProcessService);
+        }
+    }
 })();

@@ -5,10 +5,10 @@
     Interceptor.$inject = ['$q', '$rootScope'];
     function Interceptor($q, $rootScope) {
         return {
-          request: request,
-          requestError: requestError,
-          response: response,
-          responseError: responseError
+            request,
+            requestError,
+            response,
+            responseError
         }
 
         function request(config: any): any {

@@ -1,19 +1,13 @@
 (function () {
     'use strict';
-    var TagsController = (function () {
-        function TagsController($scope, storeService) {
-            this.$scope = $scope;
-            this.storeService = storeService;
-            this.init();
+    angular.module('app').controller('tagsController', tagsController);
+    tagsController.$inject = ['$scope', 'storeService'];
+    function tagsController($scope, storeService) {
+        var vm = this;
+        vm.tags = {};
+        _init();
+        function _init() {
+            storeService.getTags().then(function (tags) { vm.tags = tags; });
         }
-        TagsController.prototype.init = function () {
-            var _this = this;
-            this.storeService.getTags().then(function (tags) {
-                _this.tags = tags;
-            });
-        };
-        TagsController.$inject = ['$scope', 'storeService'];
-        return TagsController;
-    }());
-    angular.module('app').controller('tagsController', TagsController);
+    }
 })();

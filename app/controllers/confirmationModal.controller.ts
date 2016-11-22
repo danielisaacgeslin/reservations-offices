@@ -1,24 +1,23 @@
 (() => {
     'use strict';
+    angular.module('app').controller('confirmationModalController', confirmationModalController);
 
-    class ConfirmationModalController implements ng.IController{
-        static $inject: string[] = ['$scope', '$uibModalInstance', 'data'];
+    confirmationModalController.$inject = ['$scope', '$uibModalInstance', 'data'];
+    function confirmationModalController($scope, $uibModalInstance, data) {
+        const vm = this;
 
-        constructor(
-            public $scope: ng.IScope,
-            private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
-            public data: any) {
-            this.data = data;
+        vm.data = data;
+
+        vm.cancel = cancel;
+        vm.accept = accept;
+
+        function cancel(): void {
+            $uibModalInstance.dismiss('delete');
         }
 
-        public cancel(): void {
-            this.$uibModalInstance.dismiss('delete');
-        }
-
-        public accept(): void {
-            this.$uibModalInstance.close();
+        function accept(): void {
+            $uibModalInstance.close();
         }
     }
 
-    angular.module('app').controller('confirmationModalController', ConfirmationModalController);
 })();

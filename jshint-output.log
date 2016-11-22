@@ -1,0 +1,40 @@
+
+1 lint errors found in app\filters\department.filter.js
+  [5,149](W101) Line is too long.
+1 lint errors found in app\directives\calendar.directive.js
+  [19,5](W032) Unnecessary semicolon.
+1 lint errors found in app\directives\calendar.directive.js
+  [19,5](W032) Unnecessary semicolon.
+1 lint errors found in app\directives\calendar.directive.js
+  [19,5](W032) Unnecessary semicolon.
+1 lint errors found in app\directives\calendar.directive.js
+  [19,5](W032) Unnecessary semicolon.
+1 lint errors found in app\directives\calendar.directive.js
+  [19,5](W032) Unnecessary semicolon.
+1 lint errors found in app\controllers\main.controller.js
+  [11,12](W030) Expected an assignment or function call and instead saw an expression.
+2 lint errors found in app\controllers\login.controller.js
+  [12,13](W020) Read only.
+  [15,21](W020) Read only.
+2 lint errors found in app\controllers\login.controller.js
+  [12,13](W020) Read only.
+  [15,21](W020) Read only.
+2 lint errors found in app\controllers\login.controller.js
+  [12,13](W020) Read only.
+  [15,21](W020) Read only.
+2 lint errors found in app\controllers\login.controller.js
+  [12,13](W020) Read only.
+  [15,21](W020) Read only.
+2 lint errors found in app\controllers\login.controller.js
+  [12,13](W020) Read only.
+  [15,21](W020) Read only.
+3 lint errors found in app\controllers\reservation.controller.js
+  [132,82](W093) Did you mean to return a conditional instead of an assignment?
+  [135,88](W093) Did you mean to return a conditional instead of an assignment?
+  [5,35](W071) This function has too many statements. (48)
+3 lint errors found in app\controllers\reservation.controller.js
+  [132,82](W093) Did you mean to return a conditional instead of an assignment?
+  [135,88](W093) Did you mean to return a conditional instead of an assignment?
+  [5,35](W071) This function has too many statements. (48)
+1 lint errors found in app\controllers\reservation.controller.js
+  [5,35](W071) This function has too many statements. (48)

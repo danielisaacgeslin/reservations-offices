@@ -1,12 +1,12 @@
-(()=>{
-	'use strict';
-	angular.module('app').filter('dateToNumber', dateToNumberFilter);
+(() => {
+    'use strict';
+    angular.module('app').filter('dateToNumber', dateToNumberFilter);
 
-	function dateToNumberFilter(): Function {
-		return function(input: Date): number{
-      var output: number;
-      output = input.getTime();
-      return <number>output;
-    };
-	}
+    function dateToNumberFilter(): Function {
+        return function(input: Date): number {
+            var output: number;
+            output = input.getTime();
+            return <number>output;
+        };
+    }
 })();

@@ -1,21 +1,16 @@
 (() => {
     'use strict';
+    angular.module('app').controller('tagsController', tagsController);
 
-    class TagsController implements ng.IController{
-        static $inject: string[] = ['$scope', 'storeService'];
-        public tags: Object;
+    tagsController.$inject = ['$scope', 'storeService'];
+    function tagsController($scope, storeService) {
+        const vm = this;
+        vm.tags = {};
 
-        constructor(private $scope: ng.IScope, private storeService: any) {
-            this.init();
-        }
+        _init();
 
-        init(): void {
-            this.storeService.getTags().then((tags: Object) => {
-                this.tags = tags;
-            });
+        function _init(): void {
+            storeService.getTags().then((tags) => { vm.tags = tags; });
         }
     }
-
-    angular.module('app').controller('tagsController', TagsController);
-
 })();

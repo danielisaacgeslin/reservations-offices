@@ -1,4 +1,4 @@
-(()=>{
-  'use strict';
-  angular.module('app', ['ui.router','ngAnimate', 'ui.bootstrap']);
+(() => {
+    'use strict';
+    angular.module('app', ['ui.router', 'ngAnimate', 'ui.bootstrap']);
 })();

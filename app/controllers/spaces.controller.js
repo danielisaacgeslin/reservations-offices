@@ -1,19 +1,13 @@
 (function () {
     'use strict';
-    var SpacesController = (function () {
-        function SpacesController($scope, storeService) {
-            this.$scope = $scope;
-            this.storeService = storeService;
-            this.init();
+    angular.module('app').controller('spacesController', spacesController);
+    spacesController.$inject = ['$scope', 'storeService'];
+    function spacesController($scope, storeService) {
+        var vm = this;
+        vm.spaces = {};
+        _init();
+        function _init() {
+            storeService.getSpaces().then(function (spaces) { vm.spaces = spaces; });
         }
-        SpacesController.prototype.init = function () {
-            var _this = this;
-            this.storeService.getSpaces().then(function (spaces) {
-                _this.spaces = spaces;
-            });
-        };
-        SpacesController.$inject = ['$scope', 'storeService'];
-        return SpacesController;
-    }());
-    angular.module('app').controller('spacesController', SpacesController);
+    }
 })();

@@ -1,38 +1,16 @@
-(()=>{
-	'use strict';
-	angular.module('app').filter('department', departmentFilter);
+(() => {
+    'use strict';
+    angular.module('app').filter('department', departmentFilter);
 
-	function departmentFilter(): Function {
-		return function(input: string): string{
-      let output;
-			input = String(input);
-      switch(input){
-        case '1':
-          output = 'A';
-          break;
-        case '2':
-          output = 'B';
-          break;
-        case '3':
-          output = 'C';
-          break;
-				case '4':
-          output = 'D';
-          break;
-				case '5':
-          output = 'E';
-          break;
-				case '6':
-          output = 'F';
-          break;
-				case '7':
-          output = 'G';
-          break;
-        default:
-          output = 'invalid time';
-          break;
-      }
-      return <string>output;
-    };
-	}
+    function departmentFilter(): Function {
+        const abc: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G',
+            'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+            'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        return function(input: number): string {
+            let output;
+            input = Number(input);
+            output = abc[input - 1];
+            return <string>output;
+        };
+    }
 })();

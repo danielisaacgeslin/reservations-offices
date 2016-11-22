@@ -1,21 +1,16 @@
 (() => {
     'use strict';
+    angular.module('app').controller('spacesController', spacesController);
 
-    class SpacesController implements ng.IController{
-        static $inject: string[] = ['$scope', 'storeService'];
-        public spaces: Object;
+    spacesController.$inject = ['$scope', 'storeService'];
+    function spacesController($scope, storeService) {
+        const vm = this;
+        vm.spaces = {};
 
-        constructor(private $scope: ng.IScope, private storeService: any) {
-            this.init();
-        }
+        _init();
 
-        init(): void {
-            this.storeService.getSpaces().then((spaces: Object) => {
-                this.spaces = spaces;
-            });
+        function _init(): void {
+            storeService.getSpaces().then((spaces) => { vm.spaces = spaces; });
         }
     }
-
-    angular.module('app').controller('spacesController', SpacesController);
-
 })();
